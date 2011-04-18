@@ -46,7 +46,7 @@ function p = rectificacion(x)
         
     %+Tenemos L: hallar H
     H = [1 0 0 ; 0 1 0; L];
-    %+Ccalcular inv(H)
+    %+Calcular inv(H)
     H_inv = inv(H);
     
     %+For que llene la imagen
