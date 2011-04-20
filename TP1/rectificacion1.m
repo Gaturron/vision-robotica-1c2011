@@ -34,30 +34,48 @@ function p = rectificacion(x)
     %si, los nombres son una bostaaa :P
    
     %+Calcular P inf 1
-    val = (a_prima * (a_prima + b_prima))/(a_prima - b_prima);
-    p_inf1 = [val, 1]
+    p_prima = [ ((a_prima * (a_prima + b_prima))/(a_prima - b_prima)) 1];
+    pendiente_1 = (p3(1)-p1(1))/(p3(2)-p1(2));
+    p_inf1 = pendiente_1 * p_prima + p1
     %+Calcular P inf 2
-    val = (a_prima_prima * (a_prima_prima + b_prima_prima))/(a_prima_prima - b_prima_prima);
-    p_inf2 = [val, 1]
-    
+    p_prima_prima = [ ((a_prima_prima * (a_prima_prima + b_prima_prima))/(a_prima_prima - b_prima_prima)) 1];
+    pendiente_2 = (p6(1)-p4(1))/(p6(2)-p4(2));
+    p_inf2 = pendiente_2 * p_prima_prima + p4
+
     %+Cross de P inf 1 y P inf 2
-    %aca le agregue un 1 pero no estoy seguro
-    L = cross([p_inf1 1], [p_inf2 1]);
+    L = cross([p_inf1 1], [p_inf2 1])
+    L = L / norm(L);
         
     %+Tenemos L: hallar H
-    H = [1 0 0 ; 0 1 0; L];
-    %+Calcular inv(H)
-    H_inv = inv(H);
+    H = [1 0 0 ; 0 1 0; L]
+%     H = inv(H);
+%     
+%     %+For que llene la imagen
+%     image_rec = zeros(tamx*2, tamy*2);
+%     size(image_rec)
+%     for x = 1:tamx
+%         for y = 1:tamy
+%             temp = H * [x; y; 1];
+%             temp = round(temp/temp(3)) ;
+%             if(1 <= temp(1) && temp(1) <=tamx*2 && 1 <= temp(2) && temp(2) <=tamy*2)
+%                 image_rec(temp(1), temp(2)) = image(x,y);
+%             end
+%         end
+%     end
     
     %+For que llene la imagen
-    image_rec = zeros(tamx, tamy);
-    for x = 1:tamx
-        for y = 1:tamy
-            temp = H_inv * [x; y; 0];
-            temp = round(temp);
-            image_rec(temp(1), temp(2)) = image(x,y);
+    image_rec = zeros(tamx*2, tamy*2);
+    size(image_rec)
+    for x = 1:tamx*2
+        for y = 1:tamy*2
+            temp = H * [x; y; 1];
+            temp = round(temp/temp(3)) ;
+            if(1 <= temp(1) && temp(1) <=tamx && 1 <= temp(2) && temp(2) <=tamy)
+                image_rec(x, y) = image(temp(1),temp(2));
+            end
         end
     end
-    
-    imshow(image_rec)
+
+
+    imshow(image_rec);
 end
