@@ -19,6 +19,8 @@ function p = rectificacion(x)
     hold on;
     p6 = getMouseXY('gx-');
     
+    %imwrite(image, 'in.png');
+    
     %+Calculamos las distancias
     %me imagino que la onda es asi (nose que pasa sino los alineas asi)
     %  p1 ----------- p2 -------- p3
@@ -48,26 +50,13 @@ function p = rectificacion(x)
         
     %+Tenemos L: hallar H
     H = [1 0 0 ; 0 1 0; L]
-%     H = inv(H);
-%     
-%     %+For que llene la imagen
-%     image_rec = zeros(tamx*2, tamy*2);
-%     size(image_rec)
-%     for x = 1:tamx
-%         for y = 1:tamy
-%             temp = H * [x; y; 1];
-%             temp = round(temp/temp(3)) ;
-%             if(1 <= temp(1) && temp(1) <=tamx*2 && 1 <= temp(2) && temp(2) <=tamy*2)
-%                 image_rec(temp(1), temp(2)) = image(x,y);
-%             end
-%         end
-%     end
-    
+
     %+For que llene la imagen
-    image_rec = zeros(tamx*2, tamy*2);
+    image_rec = zeros(tamx*3, tamy*3);
+    image_rec = uint8(image_rec);
     size(image_rec)
-    for x = 1:tamx*2
-        for y = 1:tamy*2
+    for x = 1:1:tamx*3
+        for y = 1:1:tamy*3
             temp = H * [x; y; 1];
             temp = round(temp/temp(3)) ;
             if(1 <= temp(1) && temp(1) <=tamx && 1 <= temp(2) && temp(2) <=tamy)
@@ -76,6 +65,7 @@ function p = rectificacion(x)
         end
     end
 
-
-    imshow(image_rec);
+    imshow(image_rec)
+    image_rec;
+    %imwrite(image_rec, 'out.png');
 end
