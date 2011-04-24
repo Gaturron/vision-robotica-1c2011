@@ -23,12 +23,18 @@ function p = rectificacion(x)
     
     %calculo las rectas a partir de los puntos dados
     L1 = cross([p1 1], [p2 1])
+    L1 = L1/norm(L1)
     L2 = cross([p2 1], [p3 1])
+    L2 = L2/norm(L2)
     %L1 y L2 son ortogonales
     
     L3 = cross([p4 1], [p5 1])
+    L3 = L3/norm(L3)
     L4 = cross([p5 1], [p6 1])
+    L4 = L4/norm(L4)
     %L3 y L4 son ortogonales
+    
+    prodesc = ((L1(1)/L1(3))*(L2(1)/L2(3))) + ((L1(2)/L1(3))*(L2(2)/L2(3)))
     
     %ahora queremos calcular (l1'm1',l1'm2'+ l2'm1' ,l2'm2')s = 0
     %dos rectas l y m son ortogonales si l'*C*_inf*m' entonces A sera una
@@ -37,15 +43,26 @@ function p = rectificacion(x)
     
     %Estas dos restricciones representan l'*m = 0 ya que son ortogonales
     
-    R1 = [(L1(1)*L2(1)) (L1(2)*L2(2)) (L1(3)*L2(3))]; %restriccion 1
-    R2 = [(L3(1)*L4(1)) (L3(2)*L4(2)) (L3(3)*L4(3))]; %restriccion 2
+    R1 = [(L1(1)*L2(1)) (L1(1)*L2(2) + L1(2)*L2(1)) (L1(2)*L2(2))] %restriccion 1
+    R2 = [(L3(1)*L4(1)) (L3(1)*L4(2) + L3(2)*L4(1)) (L3(2)*L4(2))] %restriccion 2
+    
+%     R1 = [(L1(1)*L2(1)) (L1(2)*L2(2)) (L1(3)*L2(3))] %restriccion 1
+%     R2 = [(L3(1)*L4(1)) (L3(2)*L4(2)) (L3(3)*L4(3))] %restriccion 2
+    
+    %R1 = [(L1(1)*L2(1)) (L1(2)*L2(2)) 0] %restriccion 1
+    %R2 = [(L3(1)*L4(1)) (L3(2)*L4(2)) 0] %restriccion 2
     
     A = [R1;R2]
     
     A_prima = [R1(1) R1(2); R2(1) R2(2)]
     b = [R1(3);R2(3)]
-     
-    calculoS = (inv(A_prima)*(-b))
+    
+    %A_prima_inv = inv(A_prima) %muy inestable numericamente
+    
+    
+    
+    calculoS = (A_prima\(-b))
+    calculoS = calculoS/norm(calculoS)
     S1 = calculoS(1)
     S2 = calculoS(2)
     
@@ -54,20 +71,34 @@ function p = rectificacion(x)
     K = chol(S)
     
     H = [K(1) K(2) 0;K(3) K(4) 0;0 0 1]
-    
+    %H = inv(H)
+    %H = [1 0 0; 0 1 0; 0 0 1]
     %para hacer esto lo escribimos como [A|b]s = 0
     
 
 %     %+For que llene la imagen
-     image_rec = zeros(tamx*2, tamy*2);
-     image_rec = uint8(image_rec);
+%      image_rec = zeros(tamx*2, tamy*2);
+%      image_rec = uint8(image_rec);
+% 
+%      for x = 1:1:tamx*2
+%        for y = 1:1:tamy*2
+%            temp = H * [x; y; 1];
+%            temp = round(temp/temp(3)) ;
+%            if(1 <= temp(1) && temp(1) <=tamx && 1 <= temp(2) && temp(2) <=tamy)
+%                image_rec(x, y) = image(temp(1),temp(2));
+%            end
+%        end
+%     end
 
-     for x = 1:1:tamx*2
-       for y = 1:1:tamy*2
-           temp = H * [x; y; 1];
-           temp = round(temp/temp(3)) ;
-           if(1 <= temp(1) && temp(1) <=tamx && 1 <= temp(2) && temp(2) <=tamy)
-               image_rec((x + tamx/4), (y + tamy/4)) = image(temp(1),temp(2));
+    image_rec = zeros(tamx*2, tamy*2);
+    image_rec = uint8(image_rec);
+    %size(image_rec)
+    for x = (-tamx+1):1:tamx
+       for y = (-tamy+1):1:tamy
+           temp = H * [x; y; 1];%mando un punto del mundo a la imagen
+           temp = round(temp/temp(3));
+           if((1 <= temp(1)) && (temp(1) <=tamx) && (1 <= temp(2)) && (temp(2) <=tamy))
+               image_rec(x + tamx, y + tamy) = image(temp(1),temp(2));
            end
        end
     end
@@ -95,5 +126,5 @@ function p = rectificacion(x)
 
     imshow(image_rec)
     %image_rec;
-    %imwrite(image_rec, 'out.png');
+    imwrite(image_rec, 'out.png');
 end
