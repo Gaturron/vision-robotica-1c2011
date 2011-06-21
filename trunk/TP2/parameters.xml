@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<P1 type_id="opencv-matrix">
+<rows>3</rows> <cols>3</cols>
+<dt>d</dt>
+<data>1 0 0 0 1 0 0 0 1</data>
+</P1>
+
+<P2 type_id="opencv-matrix">
+<rows>3</rows> <cols>3</cols>
+<dt>d</dt>
+<data>
+  1 0 0
+  0 1 0
+  0 0 1
+</data></P2>
+
+<dist1 type_id="opencv-matrix">
+<rows>4</rows> <cols>1</cols>
+<dt>d</dt>
+<data>
+ 1
+ 2
+ 3
+ 4
+</data></dist1>
+
+<dist2 type_id="opencv-matrix">
+<rows>4</rows> <cols>1</cols>
+<dt>d</dt>
+<data>
+ 1
+ 2
+ 3
+ 4
+</data></dist2>
+
+<R type_id="opencv-matrix">
+<rows>3</rows> <cols>3</cols>
+<dt>d</dt>
+<data>
+  1 0 0
+  0 1 0
+  0 0 1
+</data></R>
+
+<T type_id="opencv-matrix">
+<rows>3</rows> <cols>1</cols>
+<dt>d</dt>
+<data> 
+1 2 3
+</data></T>
+
+</opencv_storage>
+
