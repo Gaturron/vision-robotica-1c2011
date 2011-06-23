@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
 
     cv::Mat img1, img2, img1_rect, img2_rect;   
    //imagenes
-    img1 = cv::imread("Image1_left.tif",1);
-    img2 = cv::imread("Image1_right.tif",1);
+    img2 = cv::imread("Image1_left.tif",1);
+    img1 = cv::imread("Image1_right.tif",1);
     cv::Size size = img1.size();
 //  size = cv::Size(img1.width, img1->height);
 
@@ -59,8 +59,10 @@ int main(int argc, char *argv[]) {
   cv::remap(img2, img2_rect, mapx2, mapy2, cv::INTER_LINEAR);
   //void remap(const Mat&  src, Mat&  dst, const Mat&  map1, const Mat&  map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())¶
   
-  cv::namedWindow("imagen", CV_WINDOW_AUTOSIZE);
-  cv::imshow("imagen",img1_rect);
+  cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
+  cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
+  cv::imshow("imagen1",img1_rect);
+  cv::imshow("imagen2",img2_rect);
   cv::waitKey(0);
   
    //cv::MatIterator_<double> myIter = P1.begin<double>(), it_end = P1.end<double>();
