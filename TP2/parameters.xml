@@ -3,15 +3,15 @@
 <P1 type_id="opencv-matrix">
 <rows>3</rows> <cols>3</cols>
 <dt>d</dt>
-<data>1 0 0 0 1 0 0 0 1</data>
+<data>1062.08896 0 320.82290 0 1080.05234 -127.02522 0  0 1</data>
 </P1>
 
 <P2 type_id="opencv-matrix">
 <rows>3</rows> <cols>3</cols>
 <dt>d</dt>
 <data>
-  1 0 0
-  0 1 0
+  1012.29040 0 201.21728
+  0 972.88031 71.03011
   0 0 1
 </data></P2>
 
@@ -19,36 +19,36 @@
 <rows>4</rows> <cols>1</cols>
 <dt>d</dt>
 <data>
- 1
- 2
- 3
- 4
+ 0.11241
+ -0.11122
+ -0.07696
+ 0.00204
 </data></dist1>
 
 <dist2 type_id="opencv-matrix">
 <rows>4</rows> <cols>1</cols>
 <dt>d</dt>
 <data>
- 1
- 2
- 3
- 4
+ -0.03037
+ -0.01742
+ -0.01491
+ -0.02751
 </data></dist2>
 
 <R type_id="opencv-matrix">
 <rows>3</rows> <cols>3</cols>
 <dt>d</dt>
 <data>
-  1 0 0
-  0 1 0
-  0 0 1
+  0.994792718085214 0.009986529394773 0.101428384958449
+  0.005523231462824 0.988443056658697 -0.151491972254043
+  -0.101769061894271 0.151263323293716 0.983240797092605
 </data></R>
 
 <T type_id="opencv-matrix">
 <rows>3</rows> <cols>1</cols>
 <dt>d</dt>
 <data> 
-1 2 3
+59.45608 -0.07425 0.07425
 </data></T>
 
 </opencv_storage>
