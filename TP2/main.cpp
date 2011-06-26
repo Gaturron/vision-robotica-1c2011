@@ -7,6 +7,27 @@
 using namespace std;
 using namespace cv;
 
+void moveImage(const Mat& Im1, const Mat& Im2, int offset, Mat& res){
+
+	//muevo Im2 un cacho para la derecha
+	cv::Mat mat(Im2.rows, Im2.cols+offset, CV_32F);
+	for(int i = 0; i < mat.rows; i++) {
+		for(int j = 0; j < mat.cols+offset; j++) {
+			if(j < offset){			
+				mat.at<float>(i,j) = 0;
+			}else{
+				//mat.at<double>(i,j) = Im2.at<double>(i,j-offset);		
+				mat.at<float>(i,j) = Im2.at<float>(i,j-offset);		
+			}			
+		}	
+	}
+	cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
+	cv::imshow("imagen2",mat);
+	
+	//hago addWeighted	
+
+}
+
 int main(int argc, char *argv[]) {
 
 	if (argc != 4){
@@ -57,18 +78,30 @@ int main(int argc, char *argv[]) {
 	cv::remap(img2, img2_rect, mapx2, mapy2, cv::INTER_LINEAR);
 	//void remap(const Mat&  src, Mat&  dst, const Mat&  map1, const Mat&  map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())¶
   
-	cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
-	cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
-	cv::imshow("imagen1",img1_rect);
-	cv::imshow("imagen2",img2_rect);
-	cv::waitKey(0);
+	//cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
+	//cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
+	//cv::imshow("imagen1",img1_rect);
+	//cv::imshow("imagen2",img2_rect);
+	//cv::waitKey(0);
   
-	//probemos si funciona, pegamos las dos imagenes en 1 sola con mitad de color de cada una
-	cv::Mat res;
-	cv::addWeighted(img1_rect, 0.5, img2_rect, 0.5, 0, res);
-	//void addWeighted(const MatND& src1, double alpha, const MatND& src2, double beta, double gamma, MatND& dst)	
+	cv::Mat res(img1_rect.rows*2, img1_rect.cols*2, CV_32F);
+	cv::Mat res1(img1_rect.rows*2, img1_rect.cols*2, CV_32F);
+	
 	cv::namedWindow("Imagen Res", CV_WINDOW_AUTOSIZE);
+
+	int value = 50;
+
+	cv::createTrackbar("trackbar1", "Imagen Res", &value, 100);
+
+	cv::addWeighted(img1_rect, 0.5, img2_rect, 0.5, value, res);
+
 	cv::imshow("Imagen Res",res);
+	
+	moveImage(img1_rect, img1_rect, 200, res);
+
+//	while(cv::waitKey(0)){
+		
+//	}
 
 	cv::waitKey(0);
 	

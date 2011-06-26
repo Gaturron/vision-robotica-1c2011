@@ -1,0 +1,6 @@
+usar asi:
+ ./main parameters_v.xml Image0_left.tif Image0_right.tif 
+
+compilar asi:
+ g++ -Wall `pkg-config --cflags opencv` -c -o main.o main.cpp
+ g++ -o main main.o `pkg-config --libs opencv`
