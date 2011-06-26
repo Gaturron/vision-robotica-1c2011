@@ -12,19 +12,21 @@ void moveImage(const Mat& Im1, const Mat& Im2, int offset, Mat& res){
 	//muevo Im2 un cacho para la derecha
 	cv::Mat mat(Im2.rows, Im2.cols+offset, CV_32F);
 	for(int i = 0; i < mat.rows; i++) {
-		for(int j = 0; j < mat.cols+offset; j++) {
-			if(j < offset){			
-				mat.at<float>(i,j) = 0;
+		for(int j = 0; j < mat.cols; j++) {
+			if(j < Im2.cols){			
+				mat.at<float>(i,j) = Im2.at<float>(i,j);
 			}else{
 				//mat.at<double>(i,j) = Im2.at<double>(i,j-offset);		
-				mat.at<float>(i,j) = Im2.at<float>(i,j-offset);		
+				mat.at<float>(i,j) = 0;
 			}			
 		}	
 	}
-	cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
-	cv::imshow("imagen2",mat);
+	cv::namedWindow("imagen3", CV_WINDOW_AUTOSIZE);
+	cv::imshow("imagen3",mat);
 	
 	//hago addWeighted	
+    //cv::addWeighted(Im1, 0.5, mat, 0.5, 1, res);
+    //cv::imshow("Imagen Res",res);
 
 }
 
@@ -78,11 +80,11 @@ int main(int argc, char *argv[]) {
 	cv::remap(img2, img2_rect, mapx2, mapy2, cv::INTER_LINEAR);
 	//void remap(const Mat&  src, Mat&  dst, const Mat&  map1, const Mat&  map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())¶
   
-	//cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
-	//cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
-	//cv::imshow("imagen1",img1_rect);
-	//cv::imshow("imagen2",img2_rect);
-	//cv::waitKey(0);
+	cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
+	cv::imshow("imagen1",img1_rect);
+	cv::imshow("imagen2",img2_rect);
+	cv::waitKey(0);
   
 	cv::Mat res(img1_rect.rows*2, img1_rect.cols*2, CV_32F);
 	cv::Mat res1(img1_rect.rows*2, img1_rect.cols*2, CV_32F);
@@ -93,11 +95,11 @@ int main(int argc, char *argv[]) {
 
 	cv::createTrackbar("trackbar1", "Imagen Res", &value, 100);
 
-	cv::addWeighted(img1_rect, 0.5, img2_rect, 0.5, value, res);
-
+	cv::addWeighted(img1_rect, 0.5, img2_rect, 0.5, 1, res);
+     
 	cv::imshow("Imagen Res",res);
 	
-	moveImage(img1_rect, img1_rect, 200, res);
+	moveImage(img1_rect, img1_rect, 10, res);
 
 //	while(cv::waitKey(0)){
 		
