@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include <string>
 #include <iostream>
+#include <elas.h>
    
 using namespace std;
 using namespace cv;
@@ -109,6 +110,16 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	
 	cv::namedWindow("imagen3", CV_WINDOW_AUTOSIZE);
 	cv::imshow("imagen3",grayIm1_rect);
+	int dims[3];
+	dims[0] = grayIm1_rect.cols;
+	dims[1] = grayIm1_rect.rows;
+	dims[2] = grayIm1_rect.cols;
+	// process
+  Elas::parameters param;
+  param.postprocess_only_left = false;
+  Elas elas(param);
+  elas.process(grayIm1_rect,grayIm2_rect,mapDis1,mapDis2,dims);
+
 
 	cv::waitKey(0);
 }
