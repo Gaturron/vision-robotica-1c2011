@@ -1,2 +1,2 @@
 g++ -Wall `pkg-config --cflags opencv` -c -o main.o main.cpp
-g++ -o main main.o `pkg-config --libs opencv`
+g++ -o main main.o `pkg-config --libs opencv` -L./libelas/build/ -lelas
