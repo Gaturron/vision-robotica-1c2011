@@ -11,7 +11,7 @@ using namespace cv;
 void moveImageH(const Mat& Im, int offset, Mat& res){
 
 	//muevo Im2 un cacho para la derecha
-	cv::Mat_<Vec3b> mat(Im.rows, Im.cols, CV_8UC3);
+	cv::Mat_<Vec3b> mat(Im.size(), CV_8UC3);
 	
 	for(int i = 0; i < mat.rows; i++) {
 		for(int j = 0; j < mat.cols; j++) {
@@ -31,10 +31,94 @@ void moveImageH(const Mat& Im, int offset, Mat& res){
 
 }
 
+void map2Color(cv::Mat &left_disparities, cv::Mat &mat){
+    int min_disparity = 0;
+    
+    for (int i = 0; i < mat.rows; i++) {
+        for (int j = 0; j < mat.cols; j++) {
+    
+            if (left_disparities.at<float>(i,j) > min_disparity) {
+            //if (left_disparities[j + (i*mat.rows)] > min_disparity) {
+                float val = min(left_disparities.at<float>(i,j)*0.01f,1.0f);
+                //float val = min(left_disparities[i + (j*mat.cols)]*0.01f,1.0f);
+                if (val <= 0) {
+                     mat.at<Vec3b>(i,j)[0] = 0;
+                     mat.at<Vec3b>(i,j)[1] = 0;
+                     mat.at<Vec3b>(i,j)[2] = 0;
+                    //l_[3*i+0] = 0;
+                    //l_[3*i+1] = 0;
+                    //l_[3*i+2] = 0;
+                } else {
+                    float h2 = 6.0f * (1.0f - val);
+                    unsigned char x  = (unsigned char)((1.0f - fabs(fmod(h2, 2.0f) - 1.0f))*255);
+                    if (0 <= h2&&h2<1) {
+                        //l_[3*i+0] = 255;
+                        //l_[3*i+1] = x;
+                        //l_[3*i+2] = 0;
+                        mat.at<Vec3b>(i,j)[0] = 255;
+                        mat.at<Vec3b>(i,j)[1] = x;
+                        mat.at<Vec3b>(i,j)[2] = 0;
+                    }
+                    else if (1<=h2&&h2<2)  {
+                        //l_[3*i+0] = x;
+                        //l_[3*i+1] = 255;
+                        //l_[3*i+2] = 0;
+                        mat.at<Vec3b>(i,j)[0] = x;
+                        mat.at<Vec3b>(i,j)[1] = 255;
+                        mat.at<Vec3b>(i,j)[2] = 0;
+                    }
+                    else if (2<=h2&&h2<3)  {
+                        //l_[3*i+0] = 0;
+                        //l_[3*i+1] = 255;
+                        //l_[3*i+2] = x;
+                        mat.at<Vec3b>(i,j)[0] = 0;
+                        mat.at<Vec3b>(i,j)[1] = 255;
+                        mat.at<Vec3b>(i,j)[2] = x;
+                    }
+                    else if (3<=h2&&h2<4)  {
+                        //l_[3*i+0] = 0;
+                        //l_[3*i+1] = x;
+                        //l_[3*i+2] = 255;
+                        mat.at<Vec3b>(i,j)[0] = 0;
+                        mat.at<Vec3b>(i,j)[1] = x;
+                        mat.at<Vec3b>(i,j)[2] = 255;
+                    }
+                    else if (4<=h2&&h2<5)  {
+                        //l_[3*i+0] = x;
+                        //l_[3*i+1] = 0;
+                        //l_[3*i+2] = 255;
+                        mat.at<Vec3b>(i,j)[0] = x;
+                        mat.at<Vec3b>(i,j)[1] = 0;
+                        mat.at<Vec3b>(i,j)[2] = 255;
+                    }
+                    else if (5<=h2&&h2<=6) {
+                        //l_[3*i+0] = 255;
+                        //l_[3*i+1] = 0;
+                        //l_[3*i+2] = x;
+                        mat.at<Vec3b>(i,j)[0] = 255;
+                        mat.at<Vec3b>(i,j)[1] = 0;
+                        mat.at<Vec3b>(i,j)[2] = x;
+                    }
+                }
+            }
+            else {
+                //l_[3*i+0] = 0;
+                //l_[3*i+1] = 0;
+                //l_[3*i+2] = 0;
+                mat.at<Vec3b>(i,j)[0] = 0;
+                mat.at<Vec3b>(i,j)[1] = 0;
+                mat.at<Vec3b>(i,j)[2] = 0;
+            }
+        }
+    }
+}
+
+
+
 void moveImageV(const Mat& Im, int offset, Mat& res){
 
 	//muevo Im2 un cacho para la derecha
-	cv::Mat_<Vec3b> mat(Im.rows, Im.cols, CV_8UC3);
+	cv::Mat_<Vec3b> mat(Im.size(), CV_8UC3);
 	
 	for(int i = 0; i < mat.rows; i++) {
 		for(int j = 0; j < mat.cols; j++) {
@@ -55,9 +139,9 @@ void moveImageV(const Mat& Im, int offset, Mat& res){
 }
 
 void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, int* heightValue ){
-    cv::Mat_<Vec3b> res(img1_rect.rows*2, img1_rect.cols*2, CV_8UC3);
-	cv::Mat_<Vec3b> res1(img1_rect.rows*2, img1_rect.cols*2, CV_8UC3);
-	cv::Mat_<Vec3b> output(img1_rect.rows*2, img1_rect.cols*2, CV_8UC3);
+    cv::Mat_<Vec3b> res(img1_rect.cols*2, img1_rect.rows*2, CV_8UC3);
+	cv::Mat_<Vec3b> res1(img1_rect.cols*2, img1_rect.rows*2, CV_8UC3);
+	cv::Mat_<Vec3b> output(img1_rect.cols*2, img1_rect.rows*2, CV_8UC3);
 	
 	cv::namedWindow("imgRes", CV_WINDOW_AUTOSIZE);
     int valueh = 128;
@@ -110,17 +194,23 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	
 	cv::namedWindow("imagen3", CV_WINDOW_AUTOSIZE);
 	cv::imshow("imagen3",grayIm1_rect);
-	int dims[3];
+	int32_t dims[3];
 	dims[0] = grayIm1_rect.cols;
 	dims[1] = grayIm1_rect.rows;
 	dims[2] = grayIm1_rect.cols;
+	cout << mapDis1.cols << " " << mapDis1.rows << endl;
+
 	// process
   Elas::parameters param;
-  param.postprocess_only_left = false;
+  //param.postprocess_only_left = false;
   Elas elas(param);
-  elas.process(grayIm1_rect,grayIm2_rect,mapDis1,mapDis2,dims);
+  elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
-
+    cv::Mat_<Vec3b> l1 (mapDis1.size());
+    
+    map2Color(mapDis1, l1);
+	cv::namedWindow("imagencolor", CV_WINDOW_AUTOSIZE);
+    cv::imshow("imagencolor",l1);
 	cv::waitKey(0);
 }
 
@@ -149,11 +239,13 @@ int main(int argc, char *argv[]) {
     root["R"] >> r;
     root["T"] >> t;
 
-    cv::Mat_<Vec3b> img1, img2, imgDisp1, imgDisp2;   
+    cv::Mat_<Vec3b> img1, img2;
    	//imagenes
     img2 = cv::imread(argv[3],1);
     img1 = cv::imread(argv[4],1);
 	cv::Size size = img1.size();
+    cv::Mat_<float> imgDisp1(img1.size());
+    cv::Mat_<float> imgDisp2(img1.size());   
 	//size = cv::Size(img1.width, img1->height);
 
 	//Matrices ya rectificadas
