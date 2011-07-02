@@ -267,7 +267,21 @@ int main(int argc, char *argv[]) {
         disparity(img1, img2, mapx1, mapy1, mapx2, mapy2, imgDisp1, imgDisp2);
     }
     else if((String) argv[2] == "-v"){
-        
+       
+		VideoCapture cap;
+
+		if(argc > 1) cap.open(string("cam1.mpg")); 
+		else cap.open(0);
+		Mat frame; 
+		namedWindow("video", 1);
+
+		for(;;) {
+			cap >> frame; 
+			if(!frame.data) break;
+			imshow("video", frame); 
+			if(waitKey(30) >= 0) break;
+		}
+
     }
     else{
         cout<<"no entreee"<<endl;
