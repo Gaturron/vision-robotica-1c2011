@@ -181,6 +181,7 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	cout<<valuev<<endl;
 	
 	Mat_<uchar> grayIm1_rect, grayIm2_rect;
+    Mat_<uchar> grayIm1_rect2, grayIm2_rect2;
 
     cv::cvtColor(res1, grayIm1_rect, CV_RGB2GRAY);
     cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
@@ -190,12 +191,21 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	dims[1] = grayIm1_rect.rows;
 	dims[2] = grayIm1_rect.cols;
 	cout << mapDis1.cols << " " << mapDis1.rows << endl;
-
+    
+    equalizeHist(grayIm1_rect, grayIm1_rect2);
+    equalizeHist(grayIm2_rect, grayIm2_rect2);
+    
+    /*cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
+    cv::imshow("hist1",grayIm1_rect2);
+    
+    cv::namedWindow("hist2", CV_WINDOW_AUTOSIZE);
+    cv::imshow("hist2",grayIm2_rect2);*/
+    
 	// process
     Elas::parameters param;
     //param.postprocess_only_left = false;
     Elas elas(param);
-    elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
+    elas.process(grayIm1_rect2.data,grayIm2_rect2.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
     cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
@@ -282,6 +292,9 @@ int main(int argc, char *argv[]) {
         
         disparity(img1, img2, mapx1, mapy1, mapx2, mapy2, imgDisp1, imgDisp2);
         
+        cv::imwrite("output1.tiff", imgDisp1);
+        cv::imwrite("output2.tiff", imgDisp2);
+        
         cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
         cv::imshow("imagencolor1",imgDisp1);
         
@@ -294,13 +307,17 @@ int main(int argc, char *argv[]) {
     else if((String) argv[2] == "-v"){
 		//levantamos los videos		
 		VideoCapture cap1, cap2;
+        
+        double fps = 10;
+        CvVideoWriter *writer1 = cvCreateVideoWriter("output1.avi",CV_FOURCC('M', 'J', 'P', 'G'),fps,size);
+        CvVideoWriter *writer2 = cvCreateVideoWriter("output2.avi",CV_FOURCC('M', 'J', 'P', 'G'),fps,size);
+
 
 		if(argc > 2) cap1.open(string(argv[3])); 
 		else cap1.open(0);
 	
 		if(argc > 3) cap2.open(string(argv[4])); 
 		else cap2.open(0);
-
 		 
 		namedWindow("videoIzq", CV_WINDOW_AUTOSIZE);
 		namedWindow("videoIzqDisp", CV_WINDOW_AUTOSIZE);
@@ -328,9 +345,17 @@ int main(int argc, char *argv[]) {
             
             disparity(frame1, frame2, mapx1, mapy1, mapx2, mapy2, imgDisp1, imgDisp2);
             
-			cv::imshow("videoIzq", frame1); 
+            IplImage ipl_img1 = imgDisp1;
+            IplImage ipl_img2 = imgDisp2;
             
-			imshow("videoIzqDisp", imgDisp2); 
+            cvWriteFrame(writer1, &ipl_img1);
+            cvWriteFrame(writer2, &ipl_img2);
+            
+			cv::imshow("videoIzq", frame1); 
+			imshow("videoIzqDisp", imgDisp1);
+            
+            cv::imshow("videoDer", frame2); 
+			imshow("videoDerDisp", imgDisp2); 
 			
             if(waitKey(30) > 0){
                 cout<<"Salio por falta de tiempo"<<endl;
