@@ -8,9 +8,12 @@
 using namespace std;
 using namespace cv;
 
+int alignDoIt = false;
+int valueh, valuev;
+
 void moveImageH(const Mat& Im, int offset, Mat& res){
 
-	//muevo Im2 un cacho para la derecha
+	//mueve la imagen Im horizontalmente y lo guarda en res
 	cv::Mat_<Vec3b> mat(Im.size(), CV_8UC3);
 	
 	for(int i = 0; i < mat.rows; i++) {
@@ -29,98 +32,11 @@ void moveImageH(const Mat& Im, int offset, Mat& res){
 	}
 	
 	res = mat;
-	//hago addWeighted	
-    //cv::imshow("Imagen Res",res);
-
 }
-
-void map2Color(cv::Mat &left_disparities, cv::Mat &mat){
-    int min_disparity = 0;
-    
-    for (int i = 0; i < mat.rows; i++) {
-        for (int j = 0; j < mat.cols; j++) {
-    
-            if (left_disparities.at<float>(i,j) > min_disparity) {
-            //if (left_disparities[j + (i*mat.rows)] > min_disparity) {
-                float val = min(left_disparities.at<float>(i,j)*0.01f,1.0f);
-                //float val = min(left_disparities[i + (j*mat.cols)]*0.01f,1.0f);
-                if (val <= 0) {
-                     mat.at<Vec3b>(i,j)[0] = 0;
-                     mat.at<Vec3b>(i,j)[1] = 0;
-                     mat.at<Vec3b>(i,j)[2] = 0;
-                    //l_[3*i+0] = 0;
-                    //l_[3*i+1] = 0;
-                    //l_[3*i+2] = 0;
-                } else {
-                    float h2 = 6.0f * (1.0f - val);
-                    unsigned char x  = (unsigned char)((1.0f - fabs(fmod(h2, 2.0f) - 1.0f))*255);
-                    if (0 <= h2&&h2<1) {
-                        //l_[3*i+0] = 255;
-                        //l_[3*i+1] = x;
-                        //l_[3*i+2] = 0;
-                        mat.at<Vec3b>(i,j)[0] = 255;
-                        mat.at<Vec3b>(i,j)[1] = x;
-                        mat.at<Vec3b>(i,j)[2] = 0;
-                    }
-                    else if (1<=h2&&h2<2)  {
-                        //l_[3*i+0] = x;
-                        //l_[3*i+1] = 255;
-                        //l_[3*i+2] = 0;
-                        mat.at<Vec3b>(i,j)[0] = x;
-                        mat.at<Vec3b>(i,j)[1] = 255;
-                        mat.at<Vec3b>(i,j)[2] = 0;
-                    }
-                    else if (2<=h2&&h2<3)  {
-                        //l_[3*i+0] = 0;
-                        //l_[3*i+1] = 255;
-                        //l_[3*i+2] = x;
-                        mat.at<Vec3b>(i,j)[0] = 0;
-                        mat.at<Vec3b>(i,j)[1] = 255;
-                        mat.at<Vec3b>(i,j)[2] = x;
-                    }
-                    else if (3<=h2&&h2<4)  {
-                        //l_[3*i+0] = 0;
-                        //l_[3*i+1] = x;
-                        //l_[3*i+2] = 255;
-                        mat.at<Vec3b>(i,j)[0] = 0;
-                        mat.at<Vec3b>(i,j)[1] = x;
-                        mat.at<Vec3b>(i,j)[2] = 255;
-                    }
-                    else if (4<=h2&&h2<5)  {
-                        //l_[3*i+0] = x;
-                        //l_[3*i+1] = 0;
-                        //l_[3*i+2] = 255;
-                        mat.at<Vec3b>(i,j)[0] = x;
-                        mat.at<Vec3b>(i,j)[1] = 0;
-                        mat.at<Vec3b>(i,j)[2] = 255;
-                    }
-                    else if (5<=h2&&h2<=6) {
-                        //l_[3*i+0] = 255;
-                        //l_[3*i+1] = 0;
-                        //l_[3*i+2] = x;
-                        mat.at<Vec3b>(i,j)[0] = 255;
-                        mat.at<Vec3b>(i,j)[1] = 0;
-                        mat.at<Vec3b>(i,j)[2] = x;
-                    }
-                }
-            }
-            else {
-                //l_[3*i+0] = 0;
-                //l_[3*i+1] = 0;
-                //l_[3*i+2] = 0;
-                mat.at<Vec3b>(i,j)[0] = 0;
-                mat.at<Vec3b>(i,j)[1] = 0;
-                mat.at<Vec3b>(i,j)[2] = 0;
-            }
-        }
-    }
-}
-
-
 
 void moveImageV(const Mat& Im, int offset, Mat& res){
 
-	//muevo Im2 un cacho para la derecha
+	//mueve la imagen Im verticalmente y lo guarda en res
 	cv::Mat_<Vec3b> mat(Im.size(), CV_8UC3);
 	
 	for(int i = 0; i < mat.rows; i++) {
@@ -139,11 +55,66 @@ void moveImageV(const Mat& Im, int offset, Mat& res){
 			}
 		}	
 	}
-	
+    
 	res = mat;
-	//hago addWeighted	
-    //cv::imshow("Imagen Res",res);
+}
 
+void map2Color(cv::Mat &left_disparities, cv::Mat &mat){
+    int min_disparity = 0;
+    
+    for (int i = 0; i < mat.rows; i++) {
+        for (int j = 0; j < mat.cols; j++) {
+    
+            if (left_disparities.at<float>(i,j) > min_disparity) {
+                
+                float val = min(left_disparities.at<float>(i,j)*0.01f,1.0f);
+                
+                if (val <= 0) {
+                     mat.at<Vec3b>(i,j)[0] = 0;
+                     mat.at<Vec3b>(i,j)[1] = 0;
+                     mat.at<Vec3b>(i,j)[2] = 0;
+                } else {
+                    float h2 = 6.0f * (1.0f - val);
+                    unsigned char x  = (unsigned char)((1.0f - fabs(fmod(h2, 2.0f) - 1.0f))*255);
+                    if (0 <= h2&&h2<1) {
+                        mat.at<Vec3b>(i,j)[0] = 255;
+                        mat.at<Vec3b>(i,j)[1] = x;
+                        mat.at<Vec3b>(i,j)[2] = 0;
+                    }
+                    else if (1<=h2&&h2<2)  {
+                        mat.at<Vec3b>(i,j)[0] = x;
+                        mat.at<Vec3b>(i,j)[1] = 255;
+                        mat.at<Vec3b>(i,j)[2] = 0;
+                    }
+                    else if (2<=h2&&h2<3)  {
+                        mat.at<Vec3b>(i,j)[0] = 0;
+                        mat.at<Vec3b>(i,j)[1] = 255;
+                        mat.at<Vec3b>(i,j)[2] = x;
+                    }
+                    else if (3<=h2&&h2<4)  {
+                        mat.at<Vec3b>(i,j)[0] = 0;
+                        mat.at<Vec3b>(i,j)[1] = x;
+                        mat.at<Vec3b>(i,j)[2] = 255;
+                    }
+                    else if (4<=h2&&h2<5)  {
+                        mat.at<Vec3b>(i,j)[0] = x;
+                        mat.at<Vec3b>(i,j)[1] = 0;
+                        mat.at<Vec3b>(i,j)[2] = 255;
+                    }
+                    else if (5<=h2&&h2<=6) {
+                        mat.at<Vec3b>(i,j)[0] = 255;
+                        mat.at<Vec3b>(i,j)[1] = 0;
+                        mat.at<Vec3b>(i,j)[2] = x;
+                    }
+                }
+            }
+            else {
+                mat.at<Vec3b>(i,j)[0] = 0;
+                mat.at<Vec3b>(i,j)[1] = 0;
+                mat.at<Vec3b>(i,j)[2] = 0;
+            }
+        }
+    }
 }
 
 void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, int* heightValue ){
@@ -157,10 +128,6 @@ void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, in
     
     int valuev = 128;
     cv::createTrackbar("vertical", "imgRes", &valuev, 256);
-	
-//	cv::addWeighted(img1_rect, 0.5, img2_rect, 0.5, 1, res);
-//	cv::namedWindow("imagen3", CV_WINDOW_AUTOSIZE);
-//	cv::imshow("imagen3",res);
 
 	while(cv::waitKey(200)<0){
 		moveImageH(img1_rect, valueh - 128, res);
@@ -179,44 +146,45 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
     
     cv::remap(img1, img1_rect, mapx1, mapy1, cv::INTER_LINEAR);
 	cv::remap(img2, img2_rect, mapx2, mapy2, cv::INTER_LINEAR);
-	//void remap(const Mat&  src, Mat&  dst, const Mat&  map1, const Mat&  map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())¶
-  
-	//cv::namedWindow("imagen1", CV_WINDOW_AUTOSIZE);
-	//cv::namedWindow("imagen2", CV_WINDOW_AUTOSIZE);
-	//cv::imshow("imagen1",img1_rect);
-	//cv::imshow("imagen2",img2_rect);
-	//cv::waitKey(0);
+	//void remap(const Mat&  src, Mat&  dst, const Mat&  map1, const Mat&  map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
     
-    //Interfaz grafica para alinear las imagenes
-    //esta funcion devuelve los valores (horizontal y vertical respectivamente) a desplazar cada imagen
-    int valueh, valuev;
-    alignImages(img1_rect, img2_rect, &valueh, &valuev);
+    cv::Mat_<Vec3b> res1(img1_rect.cols, img1_rect.rows, CV_8UC3);
+    cv::Mat_<Vec3b> temp1(img1_rect.cols, img1_rect.rows, CV_8UC3);
+    cv::Mat_<Vec3b> res2(img2_rect.cols, img2_rect.rows, CV_8UC3);
+    cv::Mat_<Vec3b> temp2(img2_rect.cols, img2_rect.rows, CV_8UC3);
+    
+    if(!alignDoIt){
+        cout<<"Configuro los valores de desplazamiento"<<endl;
+        
+        //Interfaz grafica para alinear las imagenes
+        //esta funcion devuelve los valores (horizontal y vertical respectivamente) a desplazar cada imagen
+        alignImages(img1_rect, img2_rect, &valueh, &valuev);
+        
+        moveImageH(img1_rect, valueh - 128, temp1);
+        moveImageV(temp1, valuev - 128, res1);
+
+        moveImageH(img2_rect, valueh - 128, temp2);
+        moveImageV(temp2, valuev - 128, res2);
+        
+        alignDoIt = true;
+    }
+    else{
+        cout<<"uso los valores de desplazamiento definidos"<<endl;
+        moveImageH(img1_rect, valueh - 128, temp1);
+        moveImageV(temp1, valuev - 128, res1);
+
+        moveImageH(img2_rect, valueh - 128, temp2);
+        moveImageV(temp2, valuev - 128, res2);
+    }
     
 	cout<<valueh<<endl;
 	cout<<valuev<<endl;
 	
 	Mat_<uchar> grayIm1_rect, grayIm2_rect;
 
-//fer
-cv::Mat_<Vec3b> res1(img1_rect.cols, img1_rect.rows, CV_8UC3);
-cv::Mat_<Vec3b> temp1(img1_rect.cols, img1_rect.rows, CV_8UC3);
-cv::Mat_<Vec3b> res2(img2_rect.cols, img2_rect.rows, CV_8UC3);
-cv::Mat_<Vec3b> temp2(img2_rect.cols, img2_rect.rows, CV_8UC3);
+    cv::cvtColor(res1, grayIm1_rect, CV_RGB2GRAY);
+    cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
 	
-moveImageH(img1_rect, valueh - 128, temp1);
-moveImageV(temp1, valuev - 128, res1);
-
-moveImageH(img2_rect, valueh - 128, temp2);
-moveImageV(temp2, valuev - 128, res2);
-
-cv::cvtColor(res1, grayIm1_rect, CV_RGB2GRAY);
-cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
-	
-	//cv::cvtColor(img1_rect, grayIm1_rect, CV_RGB2GRAY);
-	//cv::cvtColor(img2_rect, grayIm2_rect, CV_RGB2GRAY);
-	
-	cv::namedWindow("imagen3", CV_WINDOW_AUTOSIZE);
-	cv::imshow("imagen3",grayIm1_rect);
 	int32_t dims[3];
 	dims[0] = grayIm1_rect.cols;
 	dims[1] = grayIm1_rect.rows;
@@ -224,28 +192,42 @@ cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
 	cout << mapDis1.cols << " " << mapDis1.rows << endl;
 
 	// process
-  Elas::parameters param;
-  //param.postprocess_only_left = false;
-  Elas elas(param);
-  elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
+    Elas::parameters param;
+    //param.postprocess_only_left = false;
+    Elas elas(param);
+    elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
     cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
     map2Color(mapDis1, l1);
-	cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("imagencolor1",l1);
-	
+    mapDis1 = l1;
+    
     map2Color(mapDis2, l2);
-	cv::namedWindow("imagencolor2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("imagencolor2",l2);
+    mapDis2 = l2;
+}
 
-
-	cv::waitKey(0);
+void initSize(String option, String nameFile, cv::Size& size){    
+    if(option == "-i"){
+        cv::Mat_<Vec3b> img;
+        
+        img = cv::imread(nameFile);
+        size = img.size();
+    }
+    else if(option == "-v"){
+        VideoCapture cap;
+        cap.open(nameFile);
+        cv::Mat frame;
+        cap >> frame;
+        size = frame.size();
+    }
+    else{
+        cout << "Error en los parametros" << endl;
+    }
 }
 
 int main(int argc, char *argv[]) {
 
-	if (argc != 7){
+	if (argc != 5){
 		cout << "Error en los parametros" << endl;
 		return 1;
 	}
@@ -268,14 +250,12 @@ int main(int argc, char *argv[]) {
     root["R"] >> r;
     root["T"] >> t;
 
-    cv::Mat_<Vec3b> img1, img2;
-   	//imagenes
-    img2 = cv::imread(argv[3],1);
-    img1 = cv::imread(argv[4],1);
-	cv::Size size = img1.size();
-    cv::Mat_<float> imgDisp1(img1.size());
-    cv::Mat_<float> imgDisp2(img1.size());   
-	//size = cv::Size(img1.width, img1->height);
+    
+    cv::Size size;
+    initSize(argv[2], argv[3], size);
+    
+    cout<<"ancho: "<<size.width<<endl;
+    cout<<"alto: "<<size.height<<endl;
 
 	//Matrices ya rectificadas
 	cv::Mat P1, P2, R1, R2, Q;
@@ -293,89 +273,77 @@ int main(int argc, char *argv[]) {
     //HASTA ACA ES LO MISMO PARA IMAGENES Y VIDEO. LO QUE VIENE SE REPITE POR CADA IMAGEN DEL VIDEO
     
     if((String) argv[2] == "-i"){
+        cv::Mat_<Vec3b> img1, img2;
+        //imagenes
+        img2 = cv::imread(argv[3],1);
+        img1 = cv::imread(argv[4],1);
+        cv::Mat_<float> imgDisp1(size);
+        cv::Mat_<float> imgDisp2(size);   
+        
         disparity(img1, img2, mapx1, mapy1, mapx2, mapy2, imgDisp1, imgDisp2);
+        
+        cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
+        cv::imshow("imagencolor1",imgDisp1);
+        
+        cv::namedWindow("imagencolor2", CV_WINDOW_AUTOSIZE);
+        cv::imshow("imagencolor2",imgDisp2);
+
+        cv::waitKey(0);
+        
     }
     else if((String) argv[2] == "-v"){
-       
 		//levantamos los videos		
 		VideoCapture cap1, cap2;
 
-		if(argc > 4) cap1.open(string(argv[5])); 
+		if(argc > 2) cap1.open(string(argv[3])); 
 		else cap1.open(0);
 	
-		if(argc > 5) cap2.open(string(argv[6])); 
+		if(argc > 3) cap2.open(string(argv[4])); 
 		else cap2.open(0);
 
-		cv::Mat_<Vec3b> frame1, frame2; 
-		namedWindow("videoIzq", 1);
-		namedWindow("videoIzqDisp", 1);
+		 
+		namedWindow("videoIzq", CV_WINDOW_AUTOSIZE);
+		namedWindow("videoIzqDisp", CV_WINDOW_AUTOSIZE);
 		//namedWindow("videoDer", 1);
-
-		//rectificamos a mano
-		cv::Mat_<Vec3b> img1_rect, img2_rect;
-		
-		cv::remap(img1, img1_rect, mapx1, mapy1, cv::INTER_LINEAR);
-		cv::remap(img2, img2_rect, mapx2, mapy2, cv::INTER_LINEAR);
-
-		//Interfaz grafica para alinear las imagenes
-		//esta funcion devuelve los valores (horizontal y vertical respectivamente) a desplazar cada imagen
-		int valueh, valuev;
-		alignImages(img1_rect, img2_rect, &valueh, &valuev);
-		
-		cout<<valueh<<endl;
-		cout<<valuev<<endl;
-	
-		Mat_<uchar> grayIm1_rect, grayIm2_rect;
-
-		cv::Mat_<Vec3b> res1(img1_rect.cols, img1_rect.rows, CV_8UC3);
-		cv::Mat_<Vec3b> temp1(img1_rect.cols, img1_rect.rows, CV_8UC3);
-		cv::Mat_<Vec3b> res2(img2_rect.cols, img2_rect.rows, CV_8UC3);
-		cv::Mat_<Vec3b> temp2(img2_rect.cols, img2_rect.rows, CV_8UC3);
-
-		int32_t dims[3];
-
-		for(;;) {
-			cap1 >> frame1; 
-			if(!frame1.data) break;
-			cap2 >> frame2; 
-			if(!frame2.data) break;
-
-			moveImageH(frame1, valueh - 128, temp1);
-			moveImageV(temp1, valuev - 128, res1);
-			moveImageH(frame2, valueh - 128, temp2);
-			moveImageV(temp2, valuev - 128, res2);
-
-			cv::cvtColor(res1, grayIm1_rect, CV_RGB2GRAY);
-			cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
-
-			dims[0] = grayIm1_rect.cols;
-			dims[1] = grayIm1_rect.rows;
-			dims[2] = grayIm1_rect.cols;
-
-			// process
-			Elas::parameters param;
-			//param.postprocess_only_left = false;
-			Elas elas(param);
-			elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)imgDisp1.data,(float*)imgDisp2.data,dims);
-
-			cv::Mat_<Vec3b> l1 (imgDisp1.size()), l2 (imgDisp2.size());
-		
-			map2Color(imgDisp1, l1);
-
-			imshow("videoIzq", frame1); 
-			imshow("videoIzqDisp", l1); 
-			if(waitKey(30) >= 0) break;
-
-/*			imshow("videoDer", l2); 
-			if(waitKey(30) >= 0) break;*/
+        
+        cv::Mat_<Vec3b> frame1, frame2;
+        
+		for(;;){
+            cv::Mat_<float> imgDisp1(size);
+            cv::Mat_<float> imgDisp2(size);
+            //leemos el frame de cada video
+            cap1 >> frame1; 
+            if(!frame1.data){
+                cout<<"No hay mas frames primer video"<<endl;
+                break;
+            }
+            cap2 >> frame2; 
+            if(!frame2.data){
+                cout<<"No hay mas frames segundo video"<<endl;
+                break;
+            }
+            
+            //cout<<"ancho frame: "<<frame1.cols<<endl;
+            //cout<<"alto frame: "<<frame1.rows<<endl;
+            
+            disparity(frame1, frame2, mapx1, mapy1, mapx2, mapy2, imgDisp1, imgDisp2);
+            
+			cv::imshow("videoIzq", frame1); 
+            
+			imshow("videoIzqDisp", imgDisp2); 
+			
+            if(waitKey(30) > 0){
+                cout<<"Salio por falta de tiempo"<<endl;
+                break;
+            }
 		}
+        cout<<"termino el video"<<endl;
+        cv::waitKey(0);
 
     }
     else{
-        cout<<"no entreee"<<endl;
+        cout<<"Error en los parametros"<<endl;
     }
     
-	
-	
 	return 0;
 }
