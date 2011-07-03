@@ -20,7 +20,7 @@ void moveImageH(const Mat& Im, int offset, Mat& res){
 		for(int j = 0; j < mat.cols; j++) {
 			for (int c=0; c<3; c++){
 			    if(j >= offset){			
-					if(0 < j-offset && j-offset < Im.cols)
+					if(0 <= j-offset && j-offset < Im.cols)
 				    	mat.at<Vec3b>(i,j)[c] = Im.at<Vec3b>(i,j-offset)[c];
 					else
 						mat.at<Vec3b>(i,j)[c] = 0;
@@ -44,7 +44,7 @@ void moveImageV(const Mat& Im, int offset, Mat& res){
 			for (int c=0; c<3; c++){
 			    if(i >= offset){
 
-					if(0 < i - offset && i - offset < Im.rows)			
+					if(0 <= i - offset && i - offset < Im.rows)			
 					    mat.at<Vec3b>(i,j)[c] = Im.at<Vec3b>(i - offset,j)[c];
 					else			    
 						mat.at<Vec3b>(i,j)[c] = 0;
@@ -64,12 +64,12 @@ void map2Color(cv::Mat &left_disparities, cv::Mat &mat){
     
     for (int i = 0; i < mat.rows; i++) {
         for (int j = 0; j < mat.cols; j++) {
-    
+            //cout<<"disparity: "<<left_disparities.at<float>(i,j)<<endl;
             if (left_disparities.at<float>(i,j) > min_disparity) {
                 
                 float val = min(left_disparities.at<float>(i,j)*0.01f,1.0f);
-                
-                if (val <= 0) {
+                //cout<<"val: "<<val<<endl;
+                if (val < 0) {
                      mat.at<Vec3b>(i,j)[0] = 0;
                      mat.at<Vec3b>(i,j)[1] = 0;
                      mat.at<Vec3b>(i,j)[2] = 0;
@@ -123,21 +123,21 @@ void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, in
 	cv::Mat_<Vec3b> output(img1_rect.cols*2, img1_rect.rows*2, CV_8UC3);
 	
 	cv::namedWindow("imgRes", CV_WINDOW_AUTOSIZE);
-    int valueh = 128;
-    cv::createTrackbar("horizontal", "imgRes", &valueh, 256);
+    int setvalueh = 128;
+    cv::createTrackbar("horizontal", "imgRes", &setvalueh, 256);
     
-    int valuev = 128;
-    cv::createTrackbar("vertical", "imgRes", &valuev, 256);
+    int setvaluev = 128;
+    cv::createTrackbar("vertical", "imgRes", &setvaluev, 256);
 
 	while(cv::waitKey(200)<0){
-		moveImageH(img1_rect, valueh - 128, res);
-		moveImageV(res, valuev - 128, res1);
+		moveImageH(img1_rect, setvalueh - 128, res);
+		moveImageV(res, setvaluev - 128, res1);
 	    cv::addWeighted(img2_rect, 0.5, res1, 0.5, 1, output);
 		cv::imshow("imgRes",output);
 	}
 	
-	*widthValue = valueh;
-	*heightValue = valuev;
+	*widthValue = setvalueh;
+	*heightValue = setvaluev;
 }
 
 void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& mapy1, const Mat& mapx2, const Mat& mapy2,  Mat& mapDis1, Mat& mapDis2){
@@ -163,8 +163,8 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
         moveImageH(img1_rect, valueh - 128, temp1);
         moveImageV(temp1, valuev - 128, res1);
 
-        moveImageH(img2_rect, valueh - 128, temp2);
-        moveImageV(temp2, valuev - 128, res2);
+        //moveImageH(img2_rect, valueh - 128, temp2);
+        //moveImageV(temp2, valuev - 128, res2);
         
         alignDoIt = true;
     }
@@ -173,8 +173,8 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
         moveImageH(img1_rect, valueh - 128, temp1);
         moveImageV(temp1, valuev - 128, res1);
 
-        moveImageH(img2_rect, valueh - 128, temp2);
-        moveImageV(temp2, valuev - 128, res2);
+        //moveImageH(img2_rect, valueh - 128, temp2);
+        //moveImageV(temp2, valuev - 128, res2);
     }
     
 	cout<<valueh<<endl;
@@ -184,7 +184,7 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
     Mat_<uchar> grayIm1_rect2, grayIm2_rect2;
 
     cv::cvtColor(res1, grayIm1_rect, CV_RGB2GRAY);
-    cv::cvtColor(res2, grayIm2_rect, CV_RGB2GRAY);
+    cv::cvtColor(img2_rect, grayIm2_rect, CV_RGB2GRAY);
 	
 	int32_t dims[3];
 	dims[0] = grayIm1_rect.cols;
@@ -195,17 +195,17 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
     equalizeHist(grayIm1_rect, grayIm1_rect2);
     equalizeHist(grayIm2_rect, grayIm2_rect2);
     
-    /*cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
+    cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
     cv::imshow("hist1",grayIm1_rect2);
     
     cv::namedWindow("hist2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("hist2",grayIm2_rect2);*/
+    cv::imshow("hist2",grayIm2_rect2);
     
 	// process
     Elas::parameters param;
     //param.postprocess_only_left = false;
     Elas elas(param);
-    elas.process(grayIm1_rect2.data,grayIm2_rect2.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
+    elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
     cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
