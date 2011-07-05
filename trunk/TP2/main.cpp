@@ -11,6 +11,10 @@ using namespace cv;
 int alignDoIt = false;
 int valueh, valuev;
 
+void ErrorParametros(){
+    cout<<"Error en los parametros.\n Se usa:\n\n./main ARCHIVO_PARAMETROS OPCIONES ARCHIVO_IZQ ARCHIVO_DER\ndonde dice:\n\nARCHIVO_PARAMETROS: es el archivo que contiene los parámetros de la calibración de la cámara.\nOPCIONES: -i Imagenes -v Video\nARCHIVO_IZQ: es el archivo correspondiente a la camara izquierda(Sea una imagen o video)\nARCHIVO_DER: es el archivo correspondiente a la camara derecha(Sea una imagen o video)\nejemplo: \nPara imagenes:\n./main parameters.xml -i Image0_left.tif Image0_right.tif \nPara videos:\n./main parameters.xml -v cam_left.avi cam_right.avi"<<endl;
+}
+
 void moveImageH(const Mat& Im, int offset, Mat& res){
 
 	//mueve la imagen Im horizontalmente y lo guarda en res
@@ -190,22 +194,22 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	dims[0] = grayIm1_rect.cols;
 	dims[1] = grayIm1_rect.rows;
 	dims[2] = grayIm1_rect.cols;
-	cout << mapDis1.cols << " " << mapDis1.rows << endl;
+	//cout << mapDis1.cols << " " << mapDis1.rows << endl;
     
-    equalizeHist(grayIm1_rect, grayIm1_rect2);
+    /*equalizeHist(grayIm1_rect, grayIm1_rect2);
     equalizeHist(grayIm2_rect, grayIm2_rect2);
     
     cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
     cv::imshow("hist1",grayIm1_rect2);
     
     cv::namedWindow("hist2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("hist2",grayIm2_rect2);
+    cv::imshow("hist2",grayIm2_rect2);*/
     
 	// process
     Elas::parameters param;
     //param.postprocess_only_left = false;
     Elas elas(param);
-    elas.process(grayIm1_rect.data,grayIm2_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
+    elas.process(grayIm2_rect.data,grayIm1_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
     cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
@@ -231,14 +235,14 @@ void initSize(String option, String nameFile, cv::Size& size){
         size = frame.size();
     }
     else{
-        cout << "Error en los parametros" << endl;
+        ErrorParametros();
     }
 }
 
 int main(int argc, char *argv[]) {
 
 	if (argc != 5){
-		cout << "Error en los parametros" << endl;
+		ErrorParametros();
 		return 1;
 	}
 
@@ -246,7 +250,7 @@ int main(int argc, char *argv[]) {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
 	
 	if (!fs.isOpened()){
-        cout << "Error al leer el archivo " << filename << endl;
+        ErrorParametros();
         return 1;
 	}    
     
@@ -285,8 +289,8 @@ int main(int argc, char *argv[]) {
     if((String) argv[2] == "-i"){
         cv::Mat_<Vec3b> img1, img2;
         //imagenes
-        img2 = cv::imread(argv[3],1);
-        img1 = cv::imread(argv[4],1);
+        img2 = cv::imread(argv[4],1);
+        img1 = cv::imread(argv[3],1);
         cv::Mat_<float> imgDisp1(size);
         cv::Mat_<float> imgDisp2(size);   
         
@@ -298,8 +302,9 @@ int main(int argc, char *argv[]) {
         cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
         cv::imshow("imagencolor1",imgDisp1);
         
-        cv::namedWindow("imagencolor2", CV_WINDOW_AUTOSIZE);
-        cv::imshow("imagencolor2",imgDisp2);
+        //Muestro el mapa de disparidad de la camara derecha
+        //cv::namedWindow("imagencolor2", CV_WINDOW_AUTOSIZE);
+        //cv::imshow("imagencolor2",imgDisp2);
 
         cv::waitKey(0);
         
@@ -319,8 +324,8 @@ int main(int argc, char *argv[]) {
 		if(argc > 3) cap2.open(string(argv[4])); 
 		else cap2.open(0);
 		 
-		namedWindow("videoIzq", CV_WINDOW_AUTOSIZE);
-		namedWindow("videoIzqDisp", CV_WINDOW_AUTOSIZE);
+		//namedWindow("videoIzq", CV_WINDOW_AUTOSIZE);
+		//namedWindow("videoIzqDisp", CV_WINDOW_AUTOSIZE);
 		//namedWindow("videoDer", 1);
         
         cv::Mat_<Vec3b> frame1, frame2;
@@ -352,13 +357,14 @@ int main(int argc, char *argv[]) {
             cvWriteFrame(writer2, &ipl_img2);
             
 			cv::imshow("videoIzq", frame1); 
-			imshow("videoIzqDisp", imgDisp1);
+			cv::imshow("videoIzqDisp", imgDisp1);
             
-            cv::imshow("videoDer", frame2); 
-			imshow("videoDerDisp", imgDisp2); 
+            //Muestro el video correspondiente al mapa de disparidad deracha
+            //cv::imshow("videoDer", frame2); 
+			//imshow("videoDerDisp", imgDisp2); 
 			
             if(waitKey(30) > 0){
-                cout<<"Salio por falta de tiempo"<<endl;
+                cout<<"Usted ha decidio salir"<<endl;
                 break;
             }
 		}
@@ -367,7 +373,7 @@ int main(int argc, char *argv[]) {
 
     }
     else{
-        cout<<"Error en los parametros"<<endl;
+        ErrorParametros();
     }
     
 	return 0;
