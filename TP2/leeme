@@ -1,6 +1,18 @@
-usar asi:
- ./main parameters_v.xml Image0_left.tif Image0_right.tif 
+Para usar:
+ ./main ARCHIVO_PARAMETROS OPCIONES ARCHIVO_IZQ ARCHIVO_DER
+ 
+ donde dice:
+ 
+      ARCHIVO_PARAMETROS: es el archivo que contiene los parámetros de la calibración de la cámara.  
+      OPCIONES: -i Imagenes -v Video
+      ARCHIVO_IZQ: es el archivo correspondiente a la camara izquierda(Sea una imagen o video)
+      ARCHIVO_DER: es el archivo correspondiente a la camara derecha(Sea una imagen o video)
+      
+      ejemplo: 
+      Para imagenes:
+      ./main parameters.xml -i Image0_left.tif Image0_right.tif 
+      Para videos:
+      ./main parameters.xml -v cam_left.avi cam_right.avi 
 
-compilar asi:
- g++ -Wall `pkg-config --cflags opencv` -c -o main.o main.cpp
- g++ -o main main.o `pkg-config --libs opencv`
+Para compilar:
+ usar make
