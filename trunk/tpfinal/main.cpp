@@ -21,15 +21,49 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     //cv::imwrite("test1.tiff", frame_der);
 }
 
+void vectorDistancia(Mat& roi, float* vector){
+    Size size = roi.size();
+    
+    cout<<"ancho: "<<size.width<<endl;
+    cout<<"alto: "<<size.height<<endl;
+    
+    int ancho = size.width;
+    int alto = size.height;
+    
+    float sum, porcentaje;
+    
+    for(int i = 0; i < ancho; i++){
+        sum = 0.0;
+        for(int j = 0; j < alto; j++){
+            sum += roi.at<float>(i,j);
+        }
+        porcentaje = sum / alto;
+        vector[i] = porcentaje;
+    }
+}
+
 void navegacion(Mat& disparityMap){
     cv::Mat roiTemp, roi;
-    roiTemp = disparityMap.rowRange(360,380);
-    roi = roiTemp.colRange(100,540);
+    roi = disparityMap.rowRange(340,380);
+    //roi = roiTemp.colRange(0,640);
     
     Size size = roi.size();
     
     cout<<"ancho: "<<size.width<<endl;
     cout<<"alto: "<<size.height<<endl;
+    
+    float distancias [size.width];
+    
+    vectorDistancia(roi, distancias);
+    
+    for(int i = 0; i < size.width; i++){
+        cout<<distancias[i]<<", ";
+    }
+    
+    cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
+    cv::imshow("imagencolor1",roi);
+    
+    cv::waitKey(0);
 }
 
 int main(int argc, char *argv[]) {
