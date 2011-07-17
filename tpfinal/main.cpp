@@ -1,6 +1,86 @@
 #include "vision.h"
 
+void tomarImagenes(Mat& img_izq, Mat& img_der){
+    VideoCapture cap1, cap2;
+    
+    cv::Mat_<Vec3b> frame_izq, frame_der;
+    
+    cap1.open(0);
+    //cap2.open(1);
+    
+    cap1 >> frame_izq;
+    //cap2 >> frame_der;
+    
+    img_izq = frame_izq;
+    //img_der = frame_der;
+    
+    //cv::imwrite("test1.tiff", frame_izq);
+    //cv::imwrite("test1.tiff", frame_der);
+}
+
+void RectificarImagenes(p1, dist1, p2, dist2, size, ){
+    cv::Size size;
+    initSize(argv[2], argv[3], size);
+    
+    //cout<<"ancho: "<<size.width<<endl;
+    //cout<<"alto: "<<size.height<<endl;
+
+	
+}
+
 int main(int argc, char *argv[]) {
+    //le carga los parámetros intrinsecos de la camara
+    string parameterFileName = "parameters.xml";
+    
+    cv::FileStorage fs(parameterFileName, cv::FileStorage::READ);
+	
+	if (!fs.isOpened()){
+        cout<<"Error"<<endl;
+        return 1;
+	}    
+    
+    cv::FileNode root = fs.root();
+    cv::Mat p1,p2, dist1, dist2, r, t;
+
+    root["P1"] >> p1;
+    root["P2"] >> p2;
+    root["dist1"] >> dist1;
+    root["dist2"] >> dist2;
+    root["R"] >> r;
+    root["T"] >> t;
+    
+    //Imagenes capturadas
+    cv::Mat_<Vec3b> img_izq, img_der;
+    
+    cv::Size size = Size(640,480);
+    
+    //Matrices ya rectificadas
+    cv::Mat P1, P2, R1, R2, Q;
+    double alpha = 0.0;
+    cv::Rect roi1, roi2;
+    
+    //MAPA DE DISPARIDAD
+    cv::Mat_<float> dispMap_left(size);
+    cv::Mat_<float> dispMap_right(size);
+    
+    //INFO RECTIFICACION
+    cv::stereoRectify(p1, dist1, p2, dist2, size, r, t, R1, R2, P1, P2, Q, alpha, size, &roi1, &roi2, cv::CALIB_ZERO_DISPARITY); 
+
+    cv::Mat mapx1, mapy1, mapx2, mapy2;
+    cv::initUndistortRectifyMap(p1, dist1, R1, P1, size, CV_32FC1, mapx1, mapy1);
+    cv::initUndistortRectifyMap(p2, dist2, R2, P2, size, CV_32FC1, mapx2, mapy2);
+    
+    //Empieza el ciclo que realiza el proceso de navegación
+    //Ahora es un for pero despues cambiara.
+    for(int i = 0; i < 100; i++){
+        //sacamos las fotos
+        tomarImagenes(img_izq, img_der);
+        
+        disparity(img1, img2, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
+    }
+}
+
+/*int main(int argc, char *argv[]) {
 
 	if (argc != 5){
 		ErrorParametros();
@@ -140,4 +220,4 @@ int main(int argc, char *argv[]) {
     }
     
 	return 0;
-}
+}*/
