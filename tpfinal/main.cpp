@@ -5,27 +5,31 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    cap1.open(0);
+    frame_der = cv::imread("Image0_right.tif",1);
+    frame_izq = cv::imread("Image0_left.tif",1);
+    
+    //cap1.open(0);
     //cap2.open(1);
     
-    cap1 >> frame_izq;
+    //cap1 >> frame_izq;
     //cap2 >> frame_der;
     
     img_izq = frame_izq;
-    //img_der = frame_der;
+    img_der = frame_der;
     
     //cv::imwrite("test1.tiff", frame_izq);
     //cv::imwrite("test1.tiff", frame_der);
 }
 
-void RectificarImagenes(p1, dist1, p2, dist2, size, ){
-    cv::Size size;
-    initSize(argv[2], argv[3], size);
+void navegacion(Mat& disparityMap){
+    cv::Mat roiTemp, roi;
+    roiTemp = disparityMap.rowRange(360,380);
+    roi = roiTemp.colRange(100,540);
     
-    //cout<<"ancho: "<<size.width<<endl;
-    //cout<<"alto: "<<size.height<<endl;
-
-	
+    Size size = roi.size();
+    
+    cout<<"ancho: "<<size.width<<endl;
+    cout<<"alto: "<<size.height<<endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -72,12 +76,14 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 100; i++){
+    //for(int i = 0; i < 100; i++){
         //sacamos las fotos
         tomarImagenes(img_izq, img_der);
-        
-        disparity(img1, img2, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
-    }
+        cout<<"hola"<<endl;
+        disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
+        cout<<"chau"<<endl;
+        navegacion(dispMap_left);
+    //}
 }
 
 /*int main(int argc, char *argv[]) {
