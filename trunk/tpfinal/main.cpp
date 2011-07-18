@@ -23,22 +23,22 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
 
 void vectorDistancia(Mat& roi, float* vector){
     Size size = roi.size();
+
+    float porcentaje;
+	double sum [] = {0, 0, 0};    
+	
+    for(int i = 0; i < roi.rows; i++){
+        for(int j = 0; j < roi.cols; j++){
     
-    cout<<"ancho: "<<size.width<<endl;
-    cout<<"alto: "<<size.height<<endl;
-    
-    int ancho = size.width;
-    int alto = size.height;
-    
-    float sum, porcentaje;
-    
-    for(int i = 0; i < ancho; i++){
-        sum = 0.0;
-        for(int j = 0; j < alto; j++){
-            sum += roi.at<float>(i,j);
-        }
-        porcentaje = sum / alto;
-        vector[i] = porcentaje;
+			//aca hay que castear bien y hacer el promedio para cada canal RGB
+	        sum[0] += (double) roi.at<Vec3b>(i,j)[0];
+    		sum[1] += (double) roi.at<Vec3b>(i,j)[1]; 
+			sum[2] += (double) roi.at<Vec3b>(i,j)[2];
+		}
+		//aca dividir por cada uno
+        //porcentaje = sum / alto;
+		porcentaje = 0;       	
+		vector[i] = porcentaje;
     }
 }
 
@@ -113,11 +113,18 @@ int main(int argc, char *argv[]) {
     //for(int i = 0; i < 100; i++){
         //sacamos las fotos
         tomarImagenes(img_izq, img_der);
+
         cout<<"hola"<<endl;
-        //disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
-ErrorParametros();        
-	cout<<"chau"<<endl;
-        navegacion(dispMap_left);
+        disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
+		
+		cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
+	    cv::imshow("dispMapleft", dispMap_left);
+		
+		navegacion(dispMap_left);
+		
+		cv::waitKey(0);
+		cout<<"chau"<<endl;
+
     //}
 }
 
