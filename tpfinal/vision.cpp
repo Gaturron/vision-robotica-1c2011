@@ -1,4 +1,13 @@
-#include "vision.h"
+
+#include <cv.h> /* required to use OpenCV */
+#include <highgui.h> /* required to use OpenCV's highgui */
+#include "stdio.h"
+#include <string>
+#include <iostream>
+#include <elas.h>
+   
+using namespace std;
+using namespace cv;
 
 int alignDoIt = false;
 int valueh, valuev;

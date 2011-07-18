@@ -1,3 +1,6 @@
+#ifndef _VISION
+  #define _VISION
+
 #include <cv.h> /* required to use OpenCV */
 #include <highgui.h> /* required to use OpenCV's highgui */
 #include "stdio.h"
@@ -15,3 +18,5 @@ void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, in
 void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& mapy1, const Mat& mapx2, const Mat& mapy2,  Mat& mapDis1, Mat& mapDis2);
 void initSize(String option, String nameFile, cv::Size& size);
 void ErrorParametros();
+
+#endif
