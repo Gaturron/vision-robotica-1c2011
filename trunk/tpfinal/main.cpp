@@ -114,8 +114,9 @@ int main(int argc, char *argv[]) {
         //sacamos las fotos
         tomarImagenes(img_izq, img_der);
         cout<<"hola"<<endl;
-        disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
-        cout<<"chau"<<endl;
+        //disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);
+ErrorParametros();        
+	cout<<"chau"<<endl;
         navegacion(dispMap_left);
     //}
 }
