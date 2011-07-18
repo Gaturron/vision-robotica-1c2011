@@ -212,13 +212,13 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
     Elas elas(param);
     elas.process(grayIm2_rect.data,grayIm1_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
-    cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
+    /*cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
     map2Color(mapDis1, l1);
     mapDis1 = l1;
     
     map2Color(mapDis2, l2);
-    mapDis2 = l2;
+    mapDis2 = l2;*/
 }
 
 void initSize(String option, String nameFile, cv::Size& size){    
