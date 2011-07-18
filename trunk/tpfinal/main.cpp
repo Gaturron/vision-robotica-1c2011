@@ -24,21 +24,23 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
 void vectorDistancia(Mat& roi, float* vector){
     Size size = roi.size();
 
-    float porcentaje;
-	double sum [] = {0, 0, 0};    
+    double porcentaje;
+	double sum;
+    //double sum [] = {0, 0, 0};    
 	
-    for(int i = 0; i < roi.rows; i++){
-        for(int j = 0; j < roi.cols; j++){
+    for(int j = 0; j < roi.cols; j++){
+        sum = 0.0;
+        for(int i = 0; i < roi.rows; i++){
     
 			//aca hay que castear bien y hacer el promedio para cada canal RGB
-	        sum[0] += (double) roi.at<Vec3b>(i,j)[0];
-    		sum[1] += (double) roi.at<Vec3b>(i,j)[1]; 
-			sum[2] += (double) roi.at<Vec3b>(i,j)[2];
+	        sum += (double) roi.at<float>(i,j);
+    		//sum[1] += (double) roi.at<Vec3b>(i,j)[1]; 
+			//sum[2] += (double) roi.at<Vec3b>(i,j)[2];
 		}
 		//aca dividir por cada uno
-        //porcentaje = sum / alto;
-		porcentaje = 0;       	
-		vector[i] = porcentaje;
+        porcentaje = sum / roi.rows;
+		//porcentaje = 0;       	
+		vector[j] = porcentaje;
     }
 }
 
@@ -57,7 +59,7 @@ void navegacion(Mat& disparityMap){
     vectorDistancia(roi, distancias);
     
     for(int i = 0; i < size.width; i++){
-        cout<<distancias[i]<<", ";
+        cout<<i<<": "<<distancias[i]<<"\n";
     }
     
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
