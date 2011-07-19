@@ -21,27 +21,84 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     //cv::imwrite("test1.tiff", frame_der);
 }
 
-void vectorDistancia(Mat& roi, float* vector){
+void vectorDistancia(Mat& roi, double* vector){
     Size size = roi.size();
 
     double porcentaje;
 	double sum;
-    //double sum [] = {0, 0, 0};    
-	
+	double disparity;
     for(int j = 0; j < roi.cols; j++){
         sum = 0.0;
         for(int i = 0; i < roi.rows; i++){
-    
-			//aca hay que castear bien y hacer el promedio para cada canal RGB
-	        sum += (double) roi.at<float>(i,j);
-    		//sum[1] += (double) roi.at<Vec3b>(i,j)[1]; 
-			//sum[2] += (double) roi.at<Vec3b>(i,j)[2];
+			//aca hay que castear bien y hacer el promedio
+            disparity = (double) roi.at<float>(i,j);
+            if(disparity > 0){
+                sum += disparity;
+            }
 		}
-		//aca dividir por cada uno
         porcentaje = sum / roi.rows;
-		//porcentaje = 0;       	
 		vector[j] = porcentaje;
     }
+}
+
+int calcularAnchoRobot(double* distancias, int length){
+    double promedio, sum = 0;
+    for(int i = 0; i < length; i++){
+        if(distancias[i] >= 0){
+            sum += distancias[i];
+        }
+    }
+    promedio = sum / length;
+    return (int) (length / promedio);
+}
+
+
+void buscarSalida(double* distancias, int length){
+    int ancho_robot = calcularAnchoRobot(distancias, length);
+    cout<<"ancho_robot: "<<ancho_robot<<endl;
+    int indexDirection = -1;
+    int indexDirectionTemp = 0;
+    int indexlastNegativeValue;
+    double salida, sum, mejorSalida;
+    salida = 1000;
+    mejorSalida = 1000;
+    while(indexDirectionTemp < length - ancho_robot){
+        cout<<indexDirectionTemp<<": "<<(double)distancias[indexDirectionTemp]<<"\n";
+        if(distancias[indexDirectionTemp] >= 0){
+            //estos son los valores que me interesan. Los valores 
+            //negativos me indican que no tengo informacion disponible de ese punto.
+            indexlastNegativeValue = -1;
+            sum = 0.0;
+            for(int k = indexDirectionTemp; k < (indexDirectionTemp + ancho_robot); k++ ){
+                //cout<<"k: "<<k<<endl;
+                if(distancias[k] < 0){
+                    indexlastNegativeValue = k + 1;
+                    sum += distancias[k];
+                }
+            }
+            cout<<"indexlastNegativeValue: "<<indexlastNegativeValue<<endl;
+            if(indexlastNegativeValue >= 0){
+                //algun valor del subarreglo del tamaño del robot es negativo
+                //(es decir no tengo informacion del punto)
+                indexDirectionTemp = indexlastNegativeValue;
+            }
+            else{
+                //los valores del subarreglo del tamaño del robot son todos positivos
+                //(es decir tengo informacion del punto)
+                salida = sum / ancho_robot;
+                if(salida < mejorSalida){
+                    mejorSalida = salida;
+                    indexDirection = indexDirectionTemp;
+                }
+                indexDirectionTemp++;
+            }
+        }
+        else{
+            indexDirectionTemp++;
+        }
+    }
+    cout<<"indexDirection: "<<indexDirection<<endl;
+    cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
 }
 
 void navegacion(Mat& disparityMap){
@@ -54,13 +111,11 @@ void navegacion(Mat& disparityMap){
     cout<<"ancho: "<<size.width<<endl;
     cout<<"alto: "<<size.height<<endl;
     
-    float distancias [size.width];
+    double distancias [size.width];
     
     vectorDistancia(roi, distancias);
     
-    for(int i = 0; i < size.width; i++){
-        cout<<i<<": "<<distancias[i]<<"\n";
-    }
+    buscarSalida(distancias, size.width);
     
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
     cv::imshow("imagencolor1",roi);
