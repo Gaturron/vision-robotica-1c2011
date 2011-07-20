@@ -239,3 +239,28 @@ void initSize(String option, String nameFile, cv::Size& size){
         ErrorParametros();
     }
 }
+
+void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
+    //levantamos los videos
+    VideoCapture cap1, cap2;
+
+    cap1.open("cam1.avi"); 
+
+    cap2.open("cam2.avi"); 
+
+//    cv::Mat_<Vec3b> frame1, frame2;
+
+    for(int i = 0; i < numFrame; i++){
+    //leemos el frame de cada video
+        cap1 >> img_left; 
+     /*   if(!frame1.data){
+            cout<<"No hay mas frames primer video"<<endl;
+            break;
+        }*/
+        cap2 >> img_right; 
+     /*   if(!frame2.data){
+            cout<<"No hay mas frames segundo video"<<endl;
+            break;
+        }*/
+    }
+}
