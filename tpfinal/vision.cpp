@@ -128,7 +128,7 @@ void alignImages(const Mat& img1_rect, const Mat& img2_rect, int* widthValue, in
 	cv::Mat_<Vec3b> output(img1_rect.cols*2, img1_rect.rows*2, CV_8UC3);
 	
 	cv::namedWindow("imgRes", CV_WINDOW_AUTOSIZE);
-    int setvalueh = 128;
+    int setvalueh = 134;
     cv::createTrackbar("horizontal", "imgRes", &setvalueh, 256);
     
     int setvaluev = 128;
