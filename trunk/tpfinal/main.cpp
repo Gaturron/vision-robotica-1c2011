@@ -5,8 +5,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("Image0_right.tif",1);
-    frame_izq = cv::imread("Image0_left.tif",1);
+    frame_der = cv::imread("Image1_right.tif",1);
+    frame_izq = cv::imread("Image1_left.tif",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -40,14 +40,15 @@ void vectorDistancia(Mat& roi, double* vector){
 }
 
 int calcularAnchoRobot(double* distancias, int length){
-    double promedio, sum = 0;
+/*    double promedio, sum = 0;
     for(int i = 0; i < length; i++){
         if(distancias[i] >= 0){
             sum += distancias[i];
         }
     }
     promedio = sum / length;
-    return (int) (length / promedio);
+    return (int) (length / promedio);*/
+	return 1;
 }
 
 double calcularAnguloGiro(int indexDirection){
@@ -62,7 +63,7 @@ double calcularDistanciaArecorrer(double mejorSalida){
     return 0.0;
 }
 
-void buscarSalida(double* distancias, int length){
+int buscarSalida(double* distancias, int length){
     int ancho_robot = calcularAnchoRobot(distancias, length);
     cout<<"ancho_robot: "<<ancho_robot<<endl;
     int indexDirection = -1;
@@ -107,10 +108,11 @@ void buscarSalida(double* distancias, int length){
             indexDirectionTemp++;
         }
     }
-    cout<<"indexDirection: "<<indexDirection<<endl;
+    cout<<"indexDirection: "<<indexDirection<<" de "<<length<<endl;
     cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
     calcularAnguloGiro(indexDirection);
     calcularDistanciaArecorrer(mejorSalida);
+	return indexDirection;
 }
 
 void navegacion(Mat& disparityMap){
@@ -131,11 +133,15 @@ void navegacion(Mat& disparityMap){
         cout<<i<<": "<<distancias[i]<<"\n";
     }*/
     
-    buscarSalida(distancias, size.width);
+    int dir = buscarSalida(distancias, size.width);
+
+	//pongamos una linea por donde iria
+
+	cv::line(roi, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 0, 0));	
     
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
     cv::imshow("imagencolor1",roi);
-    
+
     cv::waitKey(0);
 }
 
