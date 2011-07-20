@@ -54,7 +54,15 @@ int calcularAnchoRobot(double* distancias, int length){
 double calcularAnguloGiro(int indexDirection){
     //dado el x donde f(x) indica la mejor salida tenemos que calcular el angulo de giro
     //este angulo ira de 0 a 90 o de -45 a 45 grados.
-    return 0.0;
+    double angulo = 0.0;    
+    if(indexDirection < 0){
+        //politica de escape
+    }else{
+        int temp = indexDirection - 320;
+        double RelAnguloIndex = (double) 90.0/640.0;    
+        angulo = temp * RelAnguloIndex;    
+    }
+    return angulo;
 }
 
 double calcularDistanciaArecorrer(double mejorSalida){
