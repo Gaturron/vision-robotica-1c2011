@@ -32,9 +32,7 @@ void vectorDistancia(Mat& roi, double* vector){
         for(int i = 0; i < roi.rows; i++){
 			//aca hay que castear bien y hacer el promedio
             disparity = (double) roi.at<float>(i,j);
-            if(disparity > 0){
-                sum += disparity;
-            }
+            sum += disparity;
 		}
         porcentaje = sum / roi.rows;
 		vector[j] = porcentaje;
@@ -63,7 +61,7 @@ void buscarSalida(double* distancias, int length){
     salida = 1000;
     mejorSalida = 1000;
     while(indexDirectionTemp < length - ancho_robot){
-        cout<<indexDirectionTemp<<": "<<(double)distancias[indexDirectionTemp]<<"\n";
+        //cout<<indexDirectionTemp<<": "<<distancias[indexDirectionTemp]<<"\n";
         if(distancias[indexDirectionTemp] >= 0){
             //estos son los valores que me interesan. Los valores 
             //negativos me indican que no tengo informacion disponible de ese punto.
@@ -73,10 +71,10 @@ void buscarSalida(double* distancias, int length){
                 //cout<<"k: "<<k<<endl;
                 if(distancias[k] < 0){
                     indexlastNegativeValue = k + 1;
-                    sum += distancias[k];
                 }
+                sum += distancias[k];
             }
-            cout<<"indexlastNegativeValue: "<<indexlastNegativeValue<<endl;
+            //cout<<"indexlastNegativeValue: "<<indexlastNegativeValue<<endl;
             if(indexlastNegativeValue >= 0){
                 //algun valor del subarreglo del tamaño del robot es negativo
                 //(es decir no tengo informacion del punto)
@@ -85,7 +83,8 @@ void buscarSalida(double* distancias, int length){
             else{
                 //los valores del subarreglo del tamaño del robot son todos positivos
                 //(es decir tengo informacion del punto)
-                salida = sum / ancho_robot;
+                salida =  (sum / (double)ancho_robot);
+                cout<<salida<<endl;
                 if(salida < mejorSalida){
                     mejorSalida = salida;
                     indexDirection = indexDirectionTemp;
@@ -114,6 +113,10 @@ void navegacion(Mat& disparityMap){
     double distancias [size.width];
     
     vectorDistancia(roi, distancias);
+    
+    /*for(int i = 0; i < size.width; i++ ){
+        cout<<i<<": "<<distancias[i]<<"\n";
+    }*/
     
     buscarSalida(distancias, size.width);
     
