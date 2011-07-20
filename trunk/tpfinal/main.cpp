@@ -50,6 +50,17 @@ int calcularAnchoRobot(double* distancias, int length){
     return (int) (length / promedio);
 }
 
+double calcularAnguloGiro(int indexDirection){
+    //dado el x donde f(x) indica la mejor salida tenemos que calcular el angulo de giro
+    //este angulo ira de 0 a 90 o de -45 a 45 grados.
+    return 0.0;
+}
+
+double calcularDistanciaArecorrer(double mejorSalida){
+    //tenemos que transformar el valor de disparidad en distancia
+    //(igual no sabemos como se le indica la distancia a recorrer al robot)
+    return 0.0;
+}
 
 void buscarSalida(double* distancias, int length){
     int ancho_robot = calcularAnchoRobot(distancias, length);
@@ -84,7 +95,7 @@ void buscarSalida(double* distancias, int length){
                 //los valores del subarreglo del tamaño del robot son todos positivos
                 //(es decir tengo informacion del punto)
                 salida =  (sum / (double)ancho_robot);
-                cout<<salida<<endl;
+                //cout<<salida<<endl;
                 if(salida < mejorSalida){
                     mejorSalida = salida;
                     indexDirection = indexDirectionTemp;
@@ -98,6 +109,8 @@ void buscarSalida(double* distancias, int length){
     }
     cout<<"indexDirection: "<<indexDirection<<endl;
     cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
+    calcularAnguloGiro(indexDirection);
+    calcularDistanciaArecorrer(mejorSalida);
 }
 
 void navegacion(Mat& disparityMap){
