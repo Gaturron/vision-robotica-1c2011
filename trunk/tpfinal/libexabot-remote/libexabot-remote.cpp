@@ -9,6 +9,11 @@ udp::socket* s;
 udp::endpoint receiver_endpoint;
 boost::asio::io_service io_service;
 
+
+double cantDeSegPorCadaCm = 2.0;
+double velocidad = 0.5;
+double cantDeSegPorCadaGrado = 0.1;
+
 extern "C"
 bool exa_remote_initialize(const char* hostname)
 {
@@ -35,4 +40,29 @@ void exa_remote_set_motors(float left, float right) {
   cmd[1] = (char)roundf(right * 30);
   cmd[2] = (char)roundf(left * 30);
   s->send_to(boost::asio::buffer(cmd, 3), receiver_endpoint);
+}
+
+void deplazarse(double distancia, int direccion){
+  double tiempo = cantDeSegPorCadaCm * distancia;  
+  while (tiempo > 0) {
+    double intensidad = velocidad * direccion;
+    exa_remote_set_motors(intensidad, intensidad);
+    sleep(1);  
+    tiempo --;
+  }     
+  exa_remote_set_motors(0, 0);
+}
+
+void girar(double angulo){
+  double tiempo = cantDeSegPorCadaGrado * angulo;  
+  while (tiempo > 0) {
+    if(angulo > 0){
+      exa_remote_set_motors(-1 * velocidad, velocidad);
+    }else{
+      exa_remote_set_motors(velocidad, -1 * velocidad);
+    }
+    sleep(1);  
+    tiempo --;
+  }     
+  exa_remote_set_motors(0, 0);
 }

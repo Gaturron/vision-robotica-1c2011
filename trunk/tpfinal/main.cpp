@@ -40,15 +40,15 @@ void vectorDistancia(Mat& roi, double* vector){
 }
 
 int calcularAnchoRobot(double* distancias, int length){
-/*    double promedio, sum = 0;
+    double promedio, sum = 0;
     for(int i = 0; i < length; i++){
         if(distancias[i] >= 0){
             sum += distancias[i];
         }
     }
     promedio = sum / length;
-    return (int) (length / promedio);*/
-	return 1;
+    return (int) (length / promedio);
+//	return 1;
 }
 
 double calcularAnguloGiro(int indexDirection){
@@ -137,10 +137,13 @@ void navegacion(Mat& disparityMap){
 
 	//pongamos una linea por donde iria
 
-	cv::line(roi, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 0, 0));	
+    cv::Mat_<Vec3b> roiColor (roi.size());
+	map2Color(roi, roiColor);
+
+	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
     
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("imagencolor1",roi);
+    cv::imshow("imagencolor1",roiColor);
 
     cv::waitKey(0);
 }
@@ -191,7 +194,8 @@ int main(int argc, char *argv[]) {
     //Ahora es un for pero despues cambiara.
     //for(int i = 0; i < 100; i++){
         //sacamos las fotos
-        tomarImagenes(img_izq, img_der);
+        //tomarImagenes(img_izq, img_der);
+        capturarImagenesDesdeVideo(img_izq, img_der, 60);
 
         cout<<"hola"<<endl;
         disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
