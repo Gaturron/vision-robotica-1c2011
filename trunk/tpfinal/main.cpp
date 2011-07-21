@@ -5,8 +5,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("Image1_right.tif",1);
-    frame_izq = cv::imread("Image1_left.tif",1);
+    frame_der = cv::imread("output1.jpg",1);
+    frame_izq = cv::imread("output2.jpg",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -202,8 +202,8 @@ int main(int argc, char *argv[]) {
     //Ahora es un for pero despues cambiara.
     //for(int i = 0; i < 100; i++){
         //sacamos las fotos
-        //tomarImagenes(img_izq, img_der);
-        capturarImagenesDesdeVideo(img_izq, img_der, 60);
+        tomarImagenes(img_izq, img_der);
+        //capturarImagenesDesdeVideo(img_izq, img_der, 100);
 
         cout<<"hola"<<endl;
         disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
