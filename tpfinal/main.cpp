@@ -1,12 +1,19 @@
 #include "vision.h"
+const int AVANZAR = 0;
+const int ANGULO = 1;
+int* tipoMovs;
+double* movs;
+int numMov = 0;
+double posActualx = 0;
+double posActualy = 0;
 
 void tomarImagenes(Mat& img_izq, Mat& img_der){
     VideoCapture cap1, cap2;
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("output1.jpg",1);
-    frame_izq = cv::imread("output2.jpg",1);
+    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_300.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_300.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -62,13 +69,25 @@ double calcularAnguloGiro(int indexDirection){
         double RelAnguloIndex = (double) 90.0/640.0;    
         angulo = temp * RelAnguloIndex;    
     }
+    cout<<"angulo: "<<angulo<<endl;
+    tipoMovs[numMov] = ANGULO;
+    movs[numMov] = angulo;
     return angulo;
 }
 
-double calcularDistanciaArecorrer(double mejorSalida){
+double calcularDistanciaArecorrer(double mejorSalida, double max){
     //tenemos que transformar el valor de disparidad en distancia
     //(igual no sabemos como se le indica la distancia a recorrer al robot)
-    return 0.0;
+    double distance;
+    double coeficiente = (mejorSalida/max);
+    if( coeficiente < 0.01){
+        coeficiente = 0.01;
+    }
+    distance = 10 / coeficiente;
+    cout<<"distancia: "<<distance<<endl;
+    tipoMovs[numMov] = AVANZAR;
+    movs[numMov] = distance;
+    return distance;
 }
 
 int buscarSalida(double* distancias, int length){
@@ -119,7 +138,15 @@ int buscarSalida(double* distancias, int length){
     cout<<"indexDirection: "<<indexDirection<<" de "<<length<<endl;
     cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
     calcularAnguloGiro(indexDirection);
-    calcularDistanciaArecorrer(mejorSalida);
+    
+    double max = -1;
+    for(int i = 0; i < length; i++){
+        if(distancias[i] > max){
+            max = distancias[i];
+        }
+    }
+    
+    calcularDistanciaArecorrer(mejorSalida, max);
 	return indexDirection;
 }
 
@@ -154,6 +181,11 @@ void navegacion(Mat& disparityMap){
     cv::imshow("imagencolor1",roiColor);
 
     cv::waitKey(0);
+}
+
+void calcularMapa(){
+    //calcula el mapa explorado(hasta el momento) del lugar
+    
 }
 
 int main(int argc, char *argv[]) {
@@ -197,6 +229,9 @@ int main(int argc, char *argv[]) {
     cv::Mat mapx1, mapy1, mapx2, mapy2;
     cv::initUndistortRectifyMap(p1, dist1, R1, P1, size, CV_32FC1, mapx1, mapy1);
     cv::initUndistortRectifyMap(p2, dist2, R2, P2, size, CV_32FC1, mapx2, mapy2);
+    
+    tipoMovs = new int[100];
+    movs = new double [100];
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.

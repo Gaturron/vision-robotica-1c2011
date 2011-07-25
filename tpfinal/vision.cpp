@@ -240,21 +240,65 @@ void initSize(String option, String nameFile, cv::Size& size){
     }
 }
 
+void convertir(int num,char * cConvert)
+{char aux;
+int i=0;
+int j;
+do
+{ cConvert[i++]= (num % 10) + '0';
+num=num/10;
+}
+while (num>0);
+cConvert[i--]='\0';
+j=0;
+for (;i>j;i--,j++)
+{aux=cConvert[i];
+cConvert[i]=cConvert[j];
+cConvert[j]=aux;
+}
+}
+
 void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
     //levantamos los videos
     VideoCapture cap1, cap2;
 
-    cap1.open("cam1.mpg"); 
-    cap2.open("cam2.mpg");  
+    cap1.open("/home/aolmedo/videosTP4/cam1.avi"); 
+    cap2.open("/home/aolmedo/videosTP4/cam2.avi");  
     cv::Mat_<Vec3b> frame1, frame2;
-    
-    for(int i = 0; i < numFrame; i++){
+    int cantFrames = 0;
+    string dir1, dir2, path1, path2;
+    char numImg [4];
+    dir1 = "/home/aolmedo/imgtpfinal/leftcam/";
+    dir2 = "/home/aolmedo/imgtpfinal/rightcam/";
+    for(;;){
     //leemos el frame de cada video
-        cap1 >> frame1;
-        cap2 >> frame2;
+        cap1 >> frame1; 
+        if(!frame1.data){
+            cout<<"No hay mas frames primer video"<<endl;
+            break;
+        }
+        cap2 >> frame2; 
+        if(!frame2.data){
+            cout<<"No hay mas frames segundo video"<<endl;
+            break;
+        }
+        cantFrames++;
+        
+        if(cantFrames % 20 == 0){
+            convertir(cantFrames, numImg);
+            path1 = dir1 + "leftcam_";
+            path1 += numImg;
+            path1 += ".tiff";
+            path2 = dir2 + "rightcam_";
+            path2 += numImg;
+            path2 += ".tiff";
+            cv::imwrite(path1, frame1);
+            cv::imwrite(path2, frame2);
+        }
         //cap1 >> img_left; 
        //cap2 >> img_right; 
     }
-    cv::imwrite("output1.jpg", frame1);
-    cv::imwrite("output2.jpg", frame2);
+    cout<<"cantidad de frames: "<<cantFrames<<endl;
+    //cv::imwrite("output1.tiff", frame1);
+    //cv::imwrite("output2.tiff", frame2);
 }
