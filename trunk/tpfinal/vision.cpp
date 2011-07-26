@@ -1,11 +1,6 @@
 
-#include <cv.h> /* required to use OpenCV */
-#include <highgui.h> /* required to use OpenCV's highgui */
-#include "stdio.h"
-#include <string>
-#include <iostream>
-#include <elas.h>
-   
+#include "vision.h"
+
 using namespace std;
 using namespace cv;
 
@@ -301,4 +296,28 @@ void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
     cout<<"cantidad de frames: "<<cantFrames<<endl;
     //cv::imwrite("output1.tiff", frame1);
     //cv::imwrite("output2.tiff", frame2);
+}
+
+void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right){
+    CvSize size = cvSize(640, 480);
+    int fps = 15;
+    Camera camLeft(deviceCamLeft, size.width, size.height, fps);
+    Camera camRight(deviceCamRight, size.width, size.height, fps);
+
+    camLeft.setExposure(400);
+    camRight.setExposure(400);
+
+
+    camLeft.Update();
+    camRight.Update();
+    
+    IplImage* frameLeft = cvCreateImage(size, IPL_DEPTH_8U, 3);
+    IplImage* frameRight = cvCreateImage(size, IPL_DEPTH_8U, 3);
+
+    camRight.toIplImage(frameRight);
+    camLeft.toIplImage(frameLeft);
+    
+    img_left = frameLeft;
+    img_right = frameRight;
+
 }
