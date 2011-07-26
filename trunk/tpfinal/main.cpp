@@ -249,7 +249,14 @@ int main(int argc, char *argv[]) {
     
     //INFO RECTIFICACION
     cv::stereoRectify(p1, dist1, p2, dist2, size, r, t, R1, R2, P1, P2, Q, alpha, size, &roi1, &roi2, cv::CALIB_ZERO_DISPARITY); 
-
+    Mat p3 = p2*p1;
+    for(int x = 0; x < p3.cols; x++){
+        for(int y = 0; y < p3.rows; y++){
+            cout<<" "<< p3.at<double>(x,y);
+        }
+        cout<<endl;
+    }
+    
     cv::Mat mapx1, mapy1, mapx2, mapy2;
     cv::initUndistortRectifyMap(p1, dist1, R1, P1, size, CV_32FC1, mapx1, mapy1);
     cv::initUndistortRectifyMap(p2, dist2, R2, P2, size, CV_32FC1, mapx2, mapy2);
