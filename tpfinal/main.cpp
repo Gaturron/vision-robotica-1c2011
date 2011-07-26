@@ -1,4 +1,5 @@
 #include "vision.h"
+#include "libexabot-remote/libexabot-remote.h"
 const int AVANZAR = 0;
 const int ANGULO = 1;
 int* tipoMovs;
