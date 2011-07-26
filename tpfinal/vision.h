@@ -8,7 +8,12 @@
 #include <iostream>
 #include <elas.h>
 #include "libcam/libcam.h"
-   
+#include <stdexcept>
+#include <signal.h>
+//#include <libcam.h>
+//#include "timer.h"
+#include <elas.h>
+
 using namespace std;
 using namespace cv;
 
@@ -20,5 +25,6 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 void initSize(String option, String nameFile, cv::Size& size);
 void ErrorParametros();
 void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame);
+void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right);
 
 #endif
