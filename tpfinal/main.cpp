@@ -7,6 +7,7 @@ double* movs;
 int numMov = 0;
 double posActualx = 0;
 double posActualy = 0;
+double relAnguloIndex;
 
 void tomarImagenes(Mat& img_izq, Mat& img_der){
     VideoCapture cap1, cap2;
@@ -67,8 +68,8 @@ double calcularAnguloGiro(int indexDirection){
         //politica de escape
     }else{
         int temp = indexDirection - 320;
-        double RelAnguloIndex = (double) 90.0/640.0;    
-        angulo = temp * RelAnguloIndex;    
+        relAnguloIndex = (double) 90.0/640.0;    
+        angulo = temp * relAnguloIndex;    
     }
     cout<<"angulo: "<<angulo<<endl;
     tipoMovs[numMov] = ANGULO;
@@ -192,6 +193,7 @@ void calcularMapa(){
 int main(int argc, char *argv[]) {
     //le carga los parámetros intrinsecos de la camara
     string parameterFileName = "parameters.xml";
+    string confFileName="conf.xml";
     
     cv::FileStorage fs(parameterFileName, cv::FileStorage::READ);
 	
@@ -209,6 +211,27 @@ int main(int argc, char *argv[]) {
     root["dist2"] >> dist2;
     root["R"] >> r;
     root["T"] >> t;
+    
+    
+    cv::FileStorage fsconf(confFileName, cv::FileStorage::READ);
+	
+	if (!fsconf.isOpened()){
+        cout<<"Error"<<endl;
+        return 1;
+	}    
+    
+    cv::FileNode rootConf = fsconf.root();
+    cv::Mat mat;
+    rootConf["velocidadDesplazamiento"] >> mat;
+    double velocidadDesplazamiento = mat.at<double>(0,0);
+    rootConf["velocidadMotor"] >> mat;
+    double velocidadMotor = mat.at<double>(0,0);
+    rootConf["velocidadGiro"] >> mat;
+    double velocidadGiro = mat.at<double>(0,0);
+    rootConf["relAngIndex"] >> mat;
+    relAnguloIndex = mat.at<double>(0,0);
+    
+    cout<<"relAngIndex:"<<relAnguloIndex<<endl;
     
     //Imagenes capturadas
     cv::Mat_<Vec3b> img_izq, img_der;
