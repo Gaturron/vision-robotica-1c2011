@@ -1,10 +1,16 @@
 CXXFLAGS := -g -O3 -fPIC -Wall `pkg-config --cflags opencv` -Ilibelas/src -msse2
-LDFLAGS := `pkg-config --libs opencv` -lhighgui -L./libelas/build/ -lelas 
+LDFLAGS := `pkg-config --libs opencv` -lhighgui -L./libelas/build/ -lelas -L./libexabot-remote/build/
 
-all: libelas/build/libelas.a vision main
+all: libelas/build/libelas.a libcam libexabot-remote/build vision main
 
 vision: vision.o
 	g++ -c vision.cpp -o vision.o $(CXXFLAGS)
+
+libcam:	
+	cd libcam; make
+
+libexabot-remote/build: 
+	cd libexabot-remote; mkdir build; cmake ..; 
 
 libelas/build/libelas.a:
 	cd libelas; mkdir build; cmake ..; make
@@ -12,6 +18,6 @@ libelas/build/libelas.a:
 clean:
 	rm -rf *.o main
 
-main: main.o vision.o
-	g++ -o $@ main.o vision.o $(LDFLAGS)
+main: main.o vision.o 
+	g++ -o $@ main.o vision.o libcam/libcam.o  $(LDFLAGS)
 

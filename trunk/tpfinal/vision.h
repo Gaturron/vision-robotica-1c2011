@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <elas.h>
+#include "libcam/libcam.h"
    
 using namespace std;
 using namespace cv;

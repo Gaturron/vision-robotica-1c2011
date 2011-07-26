@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<opencv_storage>
+	<!--velocidad de desplazamiento del robot en centimetros por segundo-->
+        <velocidadDesplazamiento type_id="opencv-matrix">
+                <rows>1</rows> <cols>1</cols>
+                <dt>d</dt>
+                <data>
+                        2.0       
+                </data>
+        </velocidadDesplazamiento>
+	<!--velocidad del motor-->
+        <velocidadMotor type_id="opencv-matrix">
+                <rows>1</rows> <cols>1</cols>
+                <dt>d</dt>
+                <data>
+                        0.5
+                </data>
+        </velocidadMotor>
+	<!--velocidad de giro del robot en grados por segundo-->
+        <velocidadGiro type_id="opencv-matrix">
+                <rows>1</rows> <cols>1</cols>
+                <dt>d</dt>
+                <data>
+                        0.1
+                </data>
+        </velocidadGiro>
+	<!--Relacion angulo index. cantidad de grados que corresponde a un indice de la relacion de interes-->
+        <relAngIndex type_id="opencv-matrix">
+                <rows>1</rows> <cols>1</cols>
+                <dt>d</dt>
+                <data>
+                        0.140625
+                </data>
+        </relAngIndex>
+</opencv_storage>
