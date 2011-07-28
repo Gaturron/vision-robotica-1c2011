@@ -9,7 +9,6 @@ udp::socket* s;
 udp::endpoint receiver_endpoint;
 boost::asio::io_service io_service;
 
-
 double cantDeSegPorCadaCm = 2.0;
 double velocidad = 0.5;
 double cantDeSegPorCadaGrado = 0.1;
@@ -42,6 +41,34 @@ void exa_remote_set_motors(float left, float right) {
   s->send_to(boost::asio::buffer(cmd, 3), receiver_endpoint);
 }
 
+void initRobotConf() {
+	string confFileName="conf.xml";
+
+	cv::FileStorage fsconf(confFileName, cv::FileStorage::READ);
+	
+	if (!fsconf.isOpened()){
+        cout<<"Error"<<endl;
+        return 1;
+	}    
+    
+  cv::FileNode rootConf = fsconf.root();
+  cv::Mat mat;
+  rootConf["velocidadDesplazamiento"] >> mat;
+  double velocidadDesplazamiento = mat.at<double>(0,0);
+	cantDeSegPorCadaCm = velocidadDesplazamiento;
+
+  rootConf["velocidadMotor"] >> mat;
+  double velocidadMotor = mat.at<double>(0,0);
+	velocidad = velocidadMotor;
+
+  rootConf["velocidadGiro"] >> mat;
+  double velocidadGiro = mat.at<double>(0,0);
+	cantDeSegPorCadaGrado = velocidadGiro;
+
+  rootConf["relAngIndex"] >> mat;
+  double relAnguloIndex = mat.at<double>(0,0);
+}
+
 void deplazarse(double distancia, int direccion){
   double tiempo = cantDeSegPorCadaCm * distancia;  
   while (tiempo > 0) {
@@ -55,7 +82,7 @@ void deplazarse(double distancia, int direccion){
 
 void girar(double angulo){
   double tiempo = cantDeSegPorCadaGrado * angulo;  
-  while (tiempo > 0) {
+	while (tiempo > 0) {
     if(angulo > 0){
       exa_remote_set_motors(-1 * velocidad, velocidad);
     }else{
@@ -65,4 +92,17 @@ void girar(double angulo){
     tiempo --;
   }     
   exa_remote_set_motors(0, 0);
+}
+
+void pruebaRobot(){
+	//hacemos unos movimientos para ver si los parametros andan
+	//	El recorrido es:
+	//1) Girar 90 grados a la derecha
+	girar(90);	
+	//2) Girar 180 grados a la izquierda
+	girar(-180);
+	//3) desplazarse 20 cm adelante
+	desplazarse(20, 1);
+	//4) desplazarse 10 cm para atras
+	desplazarse(10, -1);
 }
