@@ -1,5 +1,6 @@
 #include "vision.h"
-#include "libexabot-remote/libexabot-remote.h"
+//#include "libexabot-remote/libexabot-remote.h"
+
 const int AVANZAR = 0;
 const int ANGULO = 1;
 int* tipoMovs;
@@ -7,17 +8,101 @@ double* movs;
 int numMov = 0;
 double posActualx = 0;
 double posActualy = 0;
-double relAnguloIndex;
 cv::Mat Q;
 
+double cantDeSegPorCadaCm = 2.0;
+double velocidad = 0.5;
+double cantDeSegPorCadaGrado = 0.1;
+double relAnguloIndex;
+
+bool exa_remote_initialize(const char* hostname){
+cout<<"inicializo libexabot"<<endl;
+}
+
+void exa_remote_deinitialize(void){
+    cout<<"desinicializo libexabot"<<endl;
+}
+  
+void exa_remote_set_motors(float left, float right){
+    cout<<"muevo el robotito"<<endl;
+}
+
+int initRobotConf() {
+cout <<"+" << "initRobotConf " << endl;
+	string confFileName="conf.xml";
+
+	cv::FileStorage fsconf(confFileName, cv::FileStorage::READ);
+	
+	if (!fsconf.isOpened()){
+        cout<<"Error"<<endl;
+        return 1;
+	}    
+    
+  cv::FileNode rootConf = fsconf.root();
+  cv::Mat mat;
+  rootConf["velocidadDesplazamiento"] >> mat;
+  double velocidadDesplazamiento = mat.at<double>(0,0);
+	cantDeSegPorCadaCm = velocidadDesplazamiento;
+
+  rootConf["velocidadMotor"] >> mat;
+  double velocidadMotor = mat.at<double>(0,0);
+	velocidad = velocidadMotor;
+
+  rootConf["velocidadGiro"] >> mat;
+  double velocidadGiro = mat.at<double>(0,0);
+	cantDeSegPorCadaGrado = velocidadGiro;
+
+  rootConf["relAngIndex"] >> mat;
+  relAnguloIndex = mat.at<double>(0,0);
+}
+
+void desplazarse(double distancia, int direccion){
+cout <<"+" << "desplazar " << distancia * direccion << endl;
+  double tiempo = cantDeSegPorCadaCm * distancia;  
+  while (tiempo > 0) {
+    double intensidad = velocidad * direccion;
+    exa_remote_set_motors(intensidad, intensidad);
+    sleep(1);  
+    tiempo --;
+  }     
+  exa_remote_set_motors(0, 0);
+}
+
+void girar(double angulo){
+  cout <<"+" << "girar " << angulo << endl;
+  double tiempo = cantDeSegPorCadaGrado * angulo;  
+	while (tiempo > 0) {
+    if(angulo > 0){
+      exa_remote_set_motors(-1 * velocidad, velocidad);
+    }else{
+      exa_remote_set_motors(velocidad, -1 * velocidad);
+    }
+    sleep(1);  
+    tiempo --;
+  }     
+  exa_remote_set_motors(0, 0);
+}
+
+void pruebaRobot(){
+	//hacemos unos movimientos para ver si los parametros andan
+	//	El recorrido es:
+	//1) Girar 90 grados a la derecha
+	girar(90);	
+	//2) Girar 180 grados a la izquierda
+	girar(-180);
+	//3) desplazarse 20 cm adelante
+	desplazarse(20, 1);
+	//4) desplazarse 10 cm para atras
+	desplazarse(10, -1);
+}
 
 void tomarImagenes(Mat& img_izq, Mat& img_der){
     VideoCapture cap1, cap2;
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_20.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_20.tiff",1);
+    frame_der = cv::imread("/home/amit/imgtpfinal/rightcam/rightcam_20.tiff",1);
+    frame_izq = cv::imread("/home/amit/imgtpfinal/leftcam/leftcam_20.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -124,7 +209,7 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
     return distance;
 }
 
-int buscarSalida(double* distancias, int length){
+int buscarSalida(double* distancias, int length, double& angulo, double& distancia){
     int ancho_robot = calcularAnchoRobot(distancias, length);
     cout<<"ancho_robot: "<<ancho_robot<<endl;
     int indexDirection = -1;
@@ -171,7 +256,7 @@ int buscarSalida(double* distancias, int length){
     }
     cout<<"indexDirection: "<<indexDirection<<" de "<<length<<endl;
     cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
-    calcularAnguloGiro(indexDirection);
+    angulo = calcularAnguloGiro(indexDirection);
     
     double max = -1;
     for(int i = 0; i < length; i++){
@@ -180,7 +265,7 @@ int buscarSalida(double* distancias, int length){
         }
     }
     
-    calcularDistanciaArecorrer(mejorSalida, max, indexDirection);
+    distancia = calcularDistanciaArecorrer(mejorSalida, max, indexDirection);
 	return indexDirection;
 }
 
@@ -202,8 +287,17 @@ void navegacion(Mat& disparityMap){
         cout<<i<<": "<<distancias[i]<<"\n";
     }*/
     
-    int dir = buscarSalida(distancias, size.width);
-
+    double angulo, distancia;
+    
+    int dir = buscarSalida(distancias, size.width, angulo, distancia);
+    
+    girar(angulo);
+    if(distancia > 0){
+        desplazarse(distancia, 1);
+    }else{
+        desplazarse(-distancia, -1);
+    }
+    
 	//pongamos una linea por donde iria
 
     cv::Mat_<Vec3b> roiColor (roi.size());
@@ -245,7 +339,7 @@ int main(int argc, char *argv[]) {
     root["T"] >> t;
     
     
-    cv::FileStorage fsconf(confFileName, cv::FileStorage::READ);
+    /*cv::FileStorage fsconf(confFileName, cv::FileStorage::READ);
 	
 	if (!fsconf.isOpened()){
         cout<<"Error"<<endl;
@@ -263,7 +357,9 @@ int main(int argc, char *argv[]) {
     rootConf["relAngIndex"] >> mat;
     relAnguloIndex = mat.at<double>(0,0);
     
-    cout<<"relAngIndex:"<<relAnguloIndex<<endl;
+    cout<<"relAngIndex:"<<relAnguloIndex<<endl;*/
+    
+    initRobotConf();
     
     //Imagenes capturadas
     cv::Mat_<Vec3b> img_izq, img_der;
@@ -296,9 +392,11 @@ int main(int argc, char *argv[]) {
     tipoMovs = new int[100];
     movs = new double [100];
     
+    exa_remote_initialize("192.168.0.2");
+    
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    //for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 1; i++){
         //sacamos las fotos
         tomarImagenes(img_izq, img_der);
         //capturarImagenesDesdeVideo(img_izq, img_der, 100);
@@ -314,7 +412,8 @@ int main(int argc, char *argv[]) {
 		cv::waitKey(0);
 		cout<<"chau"<<endl;
 
-    //}
+    }
+    exa_remote_deinitialize();
 }
 
 /*int main(int argc, char *argv[]) {

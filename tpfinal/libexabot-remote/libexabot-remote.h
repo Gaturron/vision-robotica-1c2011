@@ -7,11 +7,6 @@ extern "C" {
   void exa_remote_deinitialize(void);
   
   void exa_remote_set_motors(float left, float right); // left,right en [-1,1]
-
-	void initRobotConf();
-  void deplazarse(double distancia, int direccion);
-  void girar(double angulo);
-	void pruebaRobot();
 }
 
 #endif
