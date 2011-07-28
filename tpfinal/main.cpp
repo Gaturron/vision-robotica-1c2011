@@ -8,14 +8,16 @@ int numMov = 0;
 double posActualx = 0;
 double posActualy = 0;
 double relAnguloIndex;
+cv::Mat Q;
+
 
 void tomarImagenes(Mat& img_izq, Mat& img_der){
     VideoCapture cap1, cap2;
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_300.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_300.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_20.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_20.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -77,18 +79,48 @@ double calcularAnguloGiro(int indexDirection){
     return angulo;
 }
 
-double calcularDistanciaArecorrer(double mejorSalida, double max){
+double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
     //tenemos que transformar el valor de disparidad en distancia
     //(igual no sabemos como se le indica la distancia a recorrer al robot)
+    double X, Y, Z, W;
+    double x, y, d;
+    
+    cv::Size size = Size(1,4);
+    cv::Mat_<double> L(size);
+    cv::Mat_<double> punto3D(size);
+    
     double distance;
     double coeficiente = (mejorSalida/max);
-    if( coeficiente < 0.01){
-        coeficiente = 0.01;
+    
+    if(index > 0){
+        x = index;
+        y = 380;
+        
+        L.at<double>(0,0) = x;
+        L.at<double>(0,1) = y;
+        L.at<double>(0,2) = mejorSalida;
+        L.at<double>(0,3) = 1;
+        
+        punto3D = Q * L;
+        
+        for(int x = 0; x < punto3D.cols; x++){
+            for(int y = 0; y < punto3D.rows; y++){
+                cout<<" "<< punto3D.at<double>(x,y)/punto3D.at<double>(0,3);
+            }
+            cout<<endl;
+        }
+        
+        if( coeficiente < 0.01){
+            coeficiente = 0.01;
+        }
+        distance = 10 / coeficiente;
+        cout<<"distancia: "<<distance<<endl;
+        tipoMovs[numMov] = AVANZAR;
+        movs[numMov] = distance;
     }
-    distance = 10 / coeficiente;
-    cout<<"distancia: "<<distance<<endl;
-    tipoMovs[numMov] = AVANZAR;
-    movs[numMov] = distance;
+    else{
+        //politica de escape
+    }
     return distance;
 }
 
@@ -148,7 +180,7 @@ int buscarSalida(double* distancias, int length){
         }
     }
     
-    calcularDistanciaArecorrer(mejorSalida, max);
+    calcularDistanciaArecorrer(mejorSalida, max, indexDirection);
 	return indexDirection;
 }
 
@@ -239,7 +271,7 @@ int main(int argc, char *argv[]) {
     cv::Size size = Size(640,480);
     
     //Matrices ya rectificadas
-    cv::Mat P1, P2, R1, R2, Q;
+    cv::Mat P1, P2, R1, R2;
     double alpha = 0.0;
     cv::Rect roi1, roi2;
     
@@ -249,10 +281,10 @@ int main(int argc, char *argv[]) {
     
     //INFO RECTIFICACION
     cv::stereoRectify(p1, dist1, p2, dist2, size, r, t, R1, R2, P1, P2, Q, alpha, size, &roi1, &roi2, cv::CALIB_ZERO_DISPARITY); 
-    Mat p3 = p2*p1;
-    for(int x = 0; x < p3.cols; x++){
-        for(int y = 0; y < p3.rows; y++){
-            cout<<" "<< p3.at<double>(x,y);
+    
+    for(int x = 0; x < Q.cols; x++){
+        for(int y = 0; y < Q.rows; y++){
+            cout<<" "<< Q.at<double>(x,y);
         }
         cout<<endl;
     }
