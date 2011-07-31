@@ -278,7 +278,7 @@ void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
         }
         cantFrames++;
         
-        if(cantFrames % 20 == 0){
+        //if(cantFrames % 20 == 0){
             convertir(cantFrames, numImg);
             path1 = dir1 + "leftcam_";
             path1 += numImg;
@@ -288,7 +288,7 @@ void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
             path2 += ".tiff";
             cv::imwrite(path1, frame1);
             cv::imwrite(path2, frame2);
-        }
+        //}
         //cap1 >> img_left; 
        //cap2 >> img_right; 
     }
