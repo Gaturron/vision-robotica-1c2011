@@ -20,7 +20,8 @@ double relAnguloIndex;
 **********************************************************************/
 
 bool exa_remote_initialize(const char* hostname){
-cout<<"inicializo libexabot"<<endl;
+    cout<<"inicializo libexabot"<<endl;
+    return true;
 }
 
 void exa_remote_deinitialize(void){
@@ -46,7 +47,7 @@ cout <<"+" << "initRobotConf " << endl;
   cv::Mat mat;
   rootConf["velocidadDesplazamiento"] >> mat;
   double velocidadDesplazamiento = mat.at<double>(0,0);
-	cantDeSegPorCadaCm = velocidadDesplazamiento;
+    cantDeSegPorCadaCm = velocidadDesplazamiento;
 
   rootConf["velocidadMotor"] >> mat;
   double velocidadMotor = mat.at<double>(0,0);
@@ -100,6 +101,29 @@ void pruebaRobot(){
 	desplazarse(10, -1);
 }
 
+void configurarParametros(){
+    double valor_avanzar, avance_robot, cantDeSegPorCadaCm_nueva, valor_girar, giro_robot, cantDeSegPorCadaGrado_nueva;
+    //configura los parametros del robot
+    //CONFIGURO LA VELOCIDAD DE DESPLAZAMIENTO DEL ROBOT
+    cout<<"indique la cantidad de centimetros que desea que el robot se mueva hacia adelante: ";
+    cin>>valor_avanzar;
+    cout<<"indique cuanto avanzo el robot para adelante: ";
+    cin>>avance_robot;
+    cantDeSegPorCadaCm_nueva = (cantDeSegPorCadaCm * valor_avanzar)/avance_robot;
+    //CONFIGURO LA VELOCIDAD DE GIRO DEL ROBOT
+    cout<<"indique la cantidad de grados que desea que el robot gire: ";
+    cin>>valor_girar;
+    cout<<"indique cuanto giro el robot: ";
+    cin>>giro_robot;
+    cantDeSegPorCadaGrado_nueva = (cantDeSegPorCadaGrado * valor_girar)/giro_robot;
+    cout<<"VELOCIDAD DE DESPLAZAMIENTO: "<<cantDeSegPorCadaCm_nueva<<endl;
+    cout<<"VELOCIDAD DE GIRO: "<<cantDeSegPorCadaGrado_nueva<<endl;
+}
+
+void casoDeTest(){
+    //nota ver mapa asociado
+}
+
 /*********************************************************************
     FUNCIONES PARA DECIDIR DONDE VA EL ROBOT
 **********************************************************************/
@@ -109,8 +133,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_220.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_220.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_460.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_460.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -406,6 +430,8 @@ int main(int argc, char *argv[]) {
     movs = new double [100];
     
     exa_remote_initialize("192.168.0.2");
+    
+    //configurarParametros();
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
