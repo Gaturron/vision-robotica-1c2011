@@ -235,22 +235,21 @@ void initSize(String option, String nameFile, cv::Size& size){
     }
 }
 
-void convertir(int num,char * cConvert)
-{char aux;
-int i=0;
-int j;
-do
-{ cConvert[i++]= (num % 10) + '0';
-num=num/10;
-}
-while (num>0);
-cConvert[i--]='\0';
-j=0;
-for (;i>j;i--,j++)
-{aux=cConvert[i];
-cConvert[i]=cConvert[j];
-cConvert[j]=aux;
-}
+void convertir(int num,char * cConvert){
+    char aux;
+    int i=0;
+    int j;
+    do{ 
+        cConvert[i++]= (num % 10) + '0';
+        num=num/10;
+    }while (num>0);
+    cConvert[i--]='\0';
+    j=0;
+    for (;i>j;i--,j++)
+        {aux=cConvert[i];
+        cConvert[i]=cConvert[j];
+        cConvert[j]=aux;
+    }
 }
 
 void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
