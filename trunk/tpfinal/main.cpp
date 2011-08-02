@@ -1,5 +1,5 @@
 #include "vision.h"
-//#include "libexabot-remote/libexabot-remote.h"
+#include "libexabot-remote/libexabot-remote.h"
 
 const int AVANZAR = 0;
 const int ANGULO = 1;
@@ -19,7 +19,7 @@ double relAnguloIndex;
     FUNCIONES PARA MOVER AL ROBOT
 **********************************************************************/
 
-bool exa_remote_initialize(const char* hostname){
+/*bool exa_remote_initialize(const char* hostname){
     cout<<"inicializo libexabot"<<endl;
     return true;
 }
@@ -30,7 +30,7 @@ void exa_remote_deinitialize(void){
   
 void exa_remote_set_motors(float left, float right){
     cout<<"muevo el robotito"<<endl;
-}
+}*/
 
 int initRobotConf() {
 cout <<"+" << "initRobotConf " << endl;
@@ -64,19 +64,19 @@ cout <<"+" << "initRobotConf " << endl;
 void desplazarse(double distancia, int direccion){
 cout <<"+" << "desplazar " << distancia * direccion << endl;
   double tiempo = cantDeSegPorCadaCm * distancia;  
-  /*while (tiempo > 0) {
+  while (tiempo > 0) {
     double intensidad = velocidad * direccion;
     exa_remote_set_motors(intensidad, intensidad);
     sleep(1);  
     tiempo --;
-  }*/    
+  }    
   exa_remote_set_motors(0, 0);
 }
 
 void girar(double angulo){
   cout <<"+" << "girar " << angulo << endl;
   double tiempo = cantDeSegPorCadaGrado * angulo;  
-	/*while (tiempo > 0) {
+	while (tiempo > 0) {
     if(angulo > 0){
       exa_remote_set_motors(-1 * velocidad, velocidad);
     }else{
@@ -84,7 +84,7 @@ void girar(double angulo){
     }
     sleep(1);  
     tiempo --;
-  }*/     
+  }     
   exa_remote_set_motors(0, 0);
 }
 
