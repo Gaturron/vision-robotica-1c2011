@@ -19,5 +19,5 @@ clean:
 	rm -rf *.o main;
 	
 main: main.o vision.o 
-	g++ -o $@ main.o vision.o libcam/libcam.o $(LDFLAGS)
+	g++ -o $@ main.o vision.o libcam/libcam.o libexabot-remote/libexabot-remote.so $(LDFLAGS)
 
