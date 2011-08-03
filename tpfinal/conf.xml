@@ -5,7 +5,7 @@
                 <rows>1</rows> <cols>1</cols>
                 <dt>d</dt>
                 <data>
-                        2.0       
+                        0.0933333 
                 </data>
         </velocidadDesplazamiento>
 	<!--velocidad del motor-->
@@ -13,7 +13,7 @@
                 <rows>1</rows> <cols>1</cols>
                 <dt>d</dt>
                 <data>
-                        0.5
+                        0.2
                 </data>
         </velocidadMotor>
 	<!--velocidad de giro del robot en grados por segundo-->
@@ -21,7 +21,7 @@
                 <rows>1</rows> <cols>1</cols>
                 <dt>d</dt>
                 <data>
-                        0.1
+                        0.037
                 </data>
         </velocidadGiro>
 	<!--Relacion angulo index. cantidad de grados que corresponde a un indice de la relacion de interes-->
