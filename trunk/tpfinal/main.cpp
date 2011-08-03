@@ -9,6 +9,7 @@ int numMov = 0;
 double posActualx = 0;
 double posActualy = 0;
 cv::Mat Q;
+bool end = false;
 
 double cantDeSegPorCadaCm = 2.0;
 double velocidad = 0.5;
@@ -31,6 +32,10 @@ void exa_remote_deinitialize(void){
 void exa_remote_set_motors(float left, float right){
     cout<<"muevo el robotito"<<endl;
 }*/
+void interrupt_signal(int s) {
+  exa_remote_set_motors(0, 0);
+  end = true;
+}
 
 int initRobotConf() {
 cout <<"+" << "initRobotConf " << endl;
@@ -63,12 +68,14 @@ cout <<"+" << "initRobotConf " << endl;
 
 void desplazarse(double distancia, int direccion){
 cout <<"+" << "desplazar " << distancia * direccion << endl;
-  double tiempo = cantDeSegPorCadaCm * distancia;  
+  double tiempo = cantDeSegPorCadaCm * distancia; 
+  cout<<"tiempo: "<<tiempo<<endl; 
   while (tiempo > 0) {
     double intensidad = velocidad * direccion;
     exa_remote_set_motors(intensidad, intensidad);
-    sleep(1);  
-    tiempo --;
+    usleep(10000);  
+    tiempo = tiempo - 0.1;
+    cout<<"tiempo: "<<tiempo<<endl;
   }    
   exa_remote_set_motors(0, 0);
 }
@@ -107,7 +114,7 @@ void configurarParametros(){
     //CONFIGURO LA VELOCIDAD DE DESPLAZAMIENTO DEL ROBOT
     cout<<"indique la cantidad de centimetros que desea que el robot se mueva hacia adelante: ";
     cin>>valor_avanzar;
-    desplazarse(valor_avanzar);
+    desplazarse(valor_avanzar,1);
     cout<<"indique cuanto avanzo el robot para adelante: ";
     cin>>avance_robot;
     cantDeSegPorCadaCm_nueva = (cantDeSegPorCadaCm * valor_avanzar)/avance_robot;
@@ -437,12 +444,16 @@ int main(int argc, char *argv[]) {
     
     exa_remote_initialize("192.168.0.2");
     
-    //configurarParametros();
+    end = false;
+    signal(SIGINT, &interrupt_signal);
+    
+    configurarParametros();
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 1; i++){
         //sacamos las fotos
+        if(!end){
         tomarImagenes(img_izq, img_der);
         //capturarImagenesDesdeVideo(img_izq, img_der, 100);
         //capturarImagenes(deviceCamLeft, deviceCamRight, Mat& img_izq, Mat& img_der)
@@ -460,5 +471,6 @@ int main(int argc, char *argv[]) {
 		//cv::waitKey(0);
 
     }
+	}
     exa_remote_deinitialize();
 }
