@@ -107,12 +107,14 @@ void configurarParametros(){
     //CONFIGURO LA VELOCIDAD DE DESPLAZAMIENTO DEL ROBOT
     cout<<"indique la cantidad de centimetros que desea que el robot se mueva hacia adelante: ";
     cin>>valor_avanzar;
+    desplazarse(valor_avanzar);
     cout<<"indique cuanto avanzo el robot para adelante: ";
     cin>>avance_robot;
     cantDeSegPorCadaCm_nueva = (cantDeSegPorCadaCm * valor_avanzar)/avance_robot;
     //CONFIGURO LA VELOCIDAD DE GIRO DEL ROBOT
     cout<<"indique la cantidad de grados que desea que el robot gire: ";
     cin>>valor_girar;
+    girar(valor_girar);
     cout<<"indique cuanto giro el robot: ";
     cin>>giro_robot;
     cantDeSegPorCadaGrado_nueva = (cantDeSegPorCadaGrado * valor_girar)/giro_robot;
@@ -185,7 +187,8 @@ double calcularAnguloGiro(int indexDirection){
     double angulo = 0.0;    
     if(indexDirection < 0){
         //politica de escape
-        girar(90);
+        angulo = 90;
+        //girar(90);
     }else{
         int temp = indexDirection - 320;
         relAnguloIndex = (double) 90.0/640.0;    
@@ -240,7 +243,8 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
     }
     else{
         //politica de escape
-        girar(90);
+        //no hace nada
+        //girar(90);
     }
     distance = Z/1000;
     return distance;
@@ -337,15 +341,15 @@ void navegacion(Mat& disparityMap){
     
 	//pongamos una linea por donde iria
 
-    cv::Mat_<Vec3b> roiColor (roi.size());
-	map2Color(roi, roiColor);
+    //cv::Mat_<Vec3b> roiColor (roi.size());
+	//map2Color(roi, roiColor);
 
-	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
+	//cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
     
-    cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("imagencolor1",roiColor);
+    //cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
+    //cv::imshow("imagencolor1",roiColor);
 
-    cv::waitKey(0);
+    //cv::waitKey(0);
 }
 
 void calcularMapa(){
@@ -401,6 +405,8 @@ int main(int argc, char *argv[]) {
     //Imagenes capturadas
     cv::Mat_<Vec3b> img_izq, img_der;
     
+    char* deviceCamLeft, deviceCamRight;
+    
     cv::Size size = Size(640,480);
     
     //Matrices ya rectificadas
@@ -435,24 +441,23 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 10; i++){
         //sacamos las fotos
         tomarImagenes(img_izq, img_der);
         //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-
-        cout<<"hola"<<endl;
+        //capturarImagenes(deviceCamLeft, deviceCamRight, Mat& img_izq, Mat& img_der)
+        
         disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
 		
         cv::Mat_<Vec3b> colorDispMap_left (dispMap_left.size());
         map2Color(dispMap_left, colorDispMap_left);
         
-		cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
-	    cv::imshow("dispMapleft", colorDispMap_left);
+		//cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
+	    //cv::imshow("dispMapleft", colorDispMap_left);
 		
 		navegacion(dispMap_left);
 		
-		cv::waitKey(0);
-		cout<<"chau"<<endl;
+		//cv::waitKey(0);
 
     }
     exa_remote_deinitialize();
