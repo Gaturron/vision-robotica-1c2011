@@ -297,7 +297,7 @@ void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
     //cv::imwrite("output2.tiff", frame2);
 }
 
-void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right){
+void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right, int index){
     CvSize size = cvSize(640, 480);
     int fps = 15;
     Camera camLeft(deviceCamLeft, size.width, size.height, fps);
@@ -318,5 +318,19 @@ void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, 
     
     img_left = frameLeft;
     img_right = frameRight;
+    
+    string path1, path2;
+    char numImg [4];
+    
+    convertir(index, numImg);
+    path1 = "leftcam_";
+    path1 += numImg;
+    path1 += ".tiff";
+    path2 = "rightcam_";
+    path2 += numImg;
+    path2 += ".tiff";
+    
+    cv::imwrite(path1, img_left);
+    cv::imwrite(path2, img_right);
 
 }

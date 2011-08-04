@@ -26,5 +26,6 @@ void initSize(String option, String nameFile, cv::Size& size);
 void ErrorParametros();
 void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame);
 void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right);
+void convertir(int num,char * cConvert);
 
 #endif
