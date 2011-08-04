@@ -5,7 +5,7 @@
                 <rows>1</rows> <cols>1</cols>
                 <dt>d</dt>
                 <data>
-                        0.0933333 
+                        0.15 
                 </data>
         </velocidadDesplazamiento>
 	<!--velocidad del motor-->
@@ -21,7 +21,7 @@
                 <rows>1</rows> <cols>1</cols>
                 <dt>d</dt>
                 <data>
-                        0.037
+                        0.0367889
                 </data>
         </velocidadGiro>
 	<!--Relacion angulo index. cantidad de grados que corresponde a un indice de la relacion de interes-->

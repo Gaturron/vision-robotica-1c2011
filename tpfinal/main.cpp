@@ -70,27 +70,27 @@ void desplazarse(double distancia, int direccion){
 cout <<"+" << "desplazar " << distancia * direccion << endl;
   double tiempo = cantDeSegPorCadaCm * distancia; 
   cout<<"tiempo: "<<tiempo<<endl; 
-  while (tiempo > 0) {
+  while (tiempo > 0 and not end) {
     double intensidad = velocidad * direccion;
     exa_remote_set_motors(intensidad, intensidad);
-    usleep(10000);  
+    usleep(100000);  
     tiempo = tiempo - 0.1;
     cout<<"tiempo: "<<tiempo<<endl;
-  }    
+  }
   exa_remote_set_motors(0, 0);
 }
 
 void girar(double angulo){
   cout <<"+" << "girar " << angulo << endl;
   double tiempo = cantDeSegPorCadaGrado * angulo;  
-	while (tiempo > 0) {
+	while (tiempo > 0 and not end) {
     if(angulo > 0){
       exa_remote_set_motors(-1 * velocidad, velocidad);
     }else{
       exa_remote_set_motors(velocidad, -1 * velocidad);
     }
-    sleep(1);  
-    tiempo --;
+    usleep(100000);  
+    tiempo = tiempo - 0.1;
   }     
   exa_remote_set_motors(0, 0);
 }
@@ -142,8 +142,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_460.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_460.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_335.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_335.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -204,7 +204,7 @@ double calcularAnguloGiro(int indexDirection){
     cout<<"angulo: "<<angulo<<endl;
     tipoMovs[numMov] = ANGULO;
     movs[numMov] = angulo;
-    return angulo;
+    return -angulo;
 }
 
 double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
@@ -449,28 +449,36 @@ int main(int argc, char *argv[]) {
     
     configurarParametros();
     
+    string path;
+    char numImg [4];
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
     for(int i = 0; i < 1; i++){
         //sacamos las fotos
-        if(!end){
-        tomarImagenes(img_izq, img_der);
-        //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-        //capturarImagenes(deviceCamLeft, deviceCamRight, Mat& img_izq, Mat& img_der)
-        
-        disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
-		
-        cv::Mat_<Vec3b> colorDispMap_left (dispMap_left.size());
-        map2Color(dispMap_left, colorDispMap_left);
-        
-		//cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
-	    //cv::imshow("dispMapleft", colorDispMap_left);
-		
-		navegacion(dispMap_left);
-		
-		//cv::waitKey(0);
+        if(not end){
+            tomarImagenes(img_izq, img_der);
+            //capturarImagenesDesdeVideo(img_izq, img_der, 100);
+            //capturarImagenes(deviceCamLeft, deviceCamRight, Mat& img_izq, Mat& img_der, i);
+            
+            disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
+            
+            cv::Mat_<Vec3b> colorDispMap_left (dispMap_left.size());
+            map2Color(dispMap_left, colorDispMap_left);
+            
+            convertir(i, numImg);
+            path = "disparityLeft_";
+            path += numImg;
+            path += ".tiff";
+            cv::imwrite(path, colorDispMap_left);
+            
+            //cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
+            //cv::imshow("dispMapleft", colorDispMap_left);
+            
+            navegacion(dispMap_left);
+            
+            //cv::waitKey(0);
 
-    }
+        }
 	}
     exa_remote_deinitialize();
 }
