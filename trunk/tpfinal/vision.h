@@ -25,7 +25,7 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 void initSize(String option, String nameFile, cv::Size& size);
 void ErrorParametros();
 void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame);
-void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right);
+void capturarImagenes(const char * deviceCamLeft, const char * deviceCamRight, Mat& img_left, Mat& img_right, int numFrame);
 void convertir(int num,char * cConvert);
 
 #endif
