@@ -412,8 +412,6 @@ int main(int argc, char *argv[]) {
     //Imagenes capturadas
     cv::Mat_<Vec3b> img_izq, img_der;
     
-    char* deviceCamLeft, deviceCamRight;
-    
     cv::Size size = Size(640,480);
     
     //Matrices ya rectificadas
@@ -447,18 +445,22 @@ int main(int argc, char *argv[]) {
     end = false;
     signal(SIGINT, &interrupt_signal);
     
-    configurarParametros();
+    //configurarParametros();
     
     string path;
     char numImg [4];
+    
+    string deviceCamLeft("/dev/video1");
+    string deviceCamRight("/dev/video2");
+    
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 10; i++){
         //sacamos las fotos
         if(not end){
-            tomarImagenes(img_izq, img_der);
+            //tomarImagenes(img_izq, img_der);
             //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-            //capturarImagenes(deviceCamLeft, deviceCamRight, Mat& img_izq, Mat& img_der, i);
+            capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
             
             disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
             

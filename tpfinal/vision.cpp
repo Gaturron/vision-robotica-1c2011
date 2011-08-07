@@ -297,9 +297,11 @@ void capturarImagenesDesdeVideo(Mat& img_left, Mat& img_right, int numFrame){
     //cv::imwrite("output2.tiff", frame2);
 }
 
-void capturarImagenes(char* deviceCamLeft, char* deviceCamRight, Mat& img_left, Mat& img_right, int index){
+void capturarImagenes(const char* deviceCamLeft, const char* deviceCamRight, Mat& img_left, Mat& img_right, int index){
     CvSize size = cvSize(640, 480);
     int fps = 15;
+    //string deviceCamLeft ="/dev/video1";
+    //string deviceCamRight ="/dev/video2";
     Camera camLeft(deviceCamLeft, size.width, size.height, fps);
     Camera camRight(deviceCamRight, size.width, size.height, fps);
 
