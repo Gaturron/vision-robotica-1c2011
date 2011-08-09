@@ -336,3 +336,39 @@ void capturarImagenes(const char* deviceCamLeft, const char* deviceCamRight, Mat
     cv::imwrite(path2, img_right);
 
 }
+
+int cantInfo(Mat& roi){
+    int sum = 0;
+    double disparity;
+    for(int j = 0; j < roi.cols; j++){
+        for(int i = 0; i < roi.rows; i++){
+			//aca hay que castear bien y hacer el promedio
+            disparity = (double) roi.at<float>(i,j);
+            if( disparity > 0 ){
+                sum++;
+            }
+		}
+    }
+    return sum;
+}
+
+void mejorROI(Mat& disparityMap, Mat& roi){
+    //elige la mejor zona de interes.
+    int mejorCantInfo = 0;
+    int info;
+    int index = 4;
+    for(int i = 0; i < 9; i++){
+        roi = disparityMap.rowRange(320 + (5 * i),360 + (5 * i));
+        info = cantInfo(roi);
+        if( info > mejorCantInfo ){
+            mejorCantInfo = info;
+            index = i;
+        }
+    }
+    cout<<"rango: ("<<320 - (5 * index)<<", "<<360 - (5 * index)<<")"<<endl;
+    roi = disparityMap.rowRange(320 - (5 * index),360 - (5 * index));
+}
+
+void capturarImagenesAvanzando(const char* deviceCamLeft, const char* deviceCamRight, Mat& img_left, Mat& img_right, int index){
+    //mientras avanza captura varias imagenes y devuelve cierta informacion que ayuda a decidir para que lado ir.
+}

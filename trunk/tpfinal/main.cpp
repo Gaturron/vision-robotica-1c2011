@@ -15,6 +15,8 @@ double cantDeSegPorCadaCm = 2.0;
 double velocidad = 0.5;
 double cantDeSegPorCadaGrado = 0.1;
 double relAnguloIndex;
+string deviceCamLeft("/dev/video1");
+string deviceCamRight("/dev/video2");
 
 /*********************************************************************
     FUNCIONES PARA MOVER AL ROBOT
@@ -142,8 +144,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/imgtpfinal/rightcam/rightcam_335.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/imgtpfinal/leftcam/leftcam_335.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/testRobot/rightcam_1.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/testRobot/leftcam_1.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -203,7 +205,8 @@ double calcularAnguloGiro(int indexDirection){
     }
     cout<<"angulo: "<<angulo<<endl;
     tipoMovs[numMov] = ANGULO;
-    movs[numMov] = angulo;
+    movs[numMov] = -angulo;
+    numMov++;
     return -angulo;
 }
 
@@ -319,7 +322,8 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
 
 void navegacion(Mat& disparityMap){
     cv::Mat roiTemp, roi;
-    roi = disparityMap.rowRange(340,380);
+    mejorROI(disparityMap, roi);
+    //roi = disparityMap.rowRange(340,380);
     //roi = roiTemp.colRange(0,640);
     
     Size size = roi.size();
@@ -338,8 +342,9 @@ void navegacion(Mat& disparityMap){
     double angulo, distancia;
     
     int dir = buscarSalida(distancias, size.width, angulo, distancia);
-    
+    pthread_t thread1;
     girar(angulo);
+    //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
     if(distancia > 0){
         desplazarse(distancia, 1);
     }else{
@@ -348,15 +353,15 @@ void navegacion(Mat& disparityMap){
     
 	//pongamos una linea por donde iria
 
-    //cv::Mat_<Vec3b> roiColor (roi.size());
-	//map2Color(roi, roiColor);
+    /*cv::Mat_<Vec3b> roiColor (roi.size());
+	map2Color(roi, roiColor);
 
-	//cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
+	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
     
-    //cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
-    //cv::imshow("imagencolor1",roiColor);
+    cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
+    cv::imshow("imagencolor1",roiColor);
 
-    //cv::waitKey(0);
+    cv::waitKey(0);*/
 }
 
 void calcularMapa(){
@@ -439,6 +444,7 @@ int main(int argc, char *argv[]) {
     
     tipoMovs = new int[100];
     movs = new double [100];
+    numMov = 0;
     
     exa_remote_initialize("192.168.0.2");
     
@@ -449,9 +455,6 @@ int main(int argc, char *argv[]) {
     
     string path;
     char numImg [4];
-    
-    string deviceCamLeft("/dev/video1");
-    string deviceCamRight("/dev/video2");
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
@@ -478,8 +481,19 @@ int main(int argc, char *argv[]) {
             
             navegacion(dispMap_left);
             
+            numMov++;
+            
             //cv::waitKey(0);
 
+        }
+        
+        for(int x = 0; x < numMov; x++){
+            if(tipoMovs[x] == AVANZAR){
+                cout<<"AVANZAR: "<<movs[x]<<endl;
+            }
+            else{
+                cout<<"GIRAR: "<<movs[x]<<endl;
+            }
         }
 	}
     exa_remote_deinitialize();
