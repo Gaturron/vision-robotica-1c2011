@@ -144,8 +144,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/testRobot/rightcam_1.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/testRobot/leftcam_1.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/testRobot/test1/rightcam_5.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/testRobot/test1/leftcam_5.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -225,7 +225,7 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
     
     if(index > 0){
         x = index;
-        y = 380;
+        y = 340;
         
         L.at<double>(0,0) = x;
         L.at<double>(0,1) = y;
@@ -243,11 +243,11 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
         cout<<"Y: "<<Y/1000<<" cm"<<endl;
         cout<<"Z: "<<Z/1000<<" cm"<<endl;
         
-        if( coeficiente < 0.01){
+        /*if( coeficiente < 0.01){
             coeficiente = 0.01;
         }
         distance = 10 / coeficiente;
-        cout<<"distancia: "<<distance<<endl;
+        cout<<"distancia: "<<distance<<endl;*/
         tipoMovs[numMov] = AVANZAR;
         movs[numMov] = distance;
     }
@@ -320,10 +320,91 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
 	return indexDirection;
 }
 
+void puntosRoi(Mat& roi){
+    int roiStartY = 300;
+    double X, Y, Z, W;
+    double promX = 0.0;
+    double promY = 0.0;
+    double promZ = 0.0;
+    double promW = 0.0;
+    
+    double promGeneralX = 0.0;
+    double promGeneralY = 0.0;
+    double promGeneralZ = 0.0;
+    
+    cv::Size size2 = Size(1,4);
+    cv::Mat_<double> L(size2);
+    cv::Mat_<double> punto3D(size2);
+    
+    double disparity = 0;
+    int x, y;
+    Size size = roi.size();
+    
+    cout<<"ancho roi: "<<size.width<<endl;
+    cout<<"alto roi: "<<size.height<<endl;
+    
+    for(x = 0; x < size.width; x++){
+        //me muevo en x (ancho)
+        for(y = 0; y < size.height; y++){
+            //me muevo en y (alto)
+            //cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
+            //cout<<"ANTES DE DISPARITY"<<endl;
+            disparity = roi.at<double>(x, y);
+            //cout<<"disparity: "<<disparity<<endl;
+            
+            if(disparity >= 0.1){
+                L.at<double>(0,0) = x;
+                L.at<double>(0,1) = roiStartY + y;
+                L.at<double>(0,2) = disparity;
+                L.at<double>(0,3) = 1;
+                punto3D = Q * L;
+                
+                X = punto3D.at<double>(0,0)/punto3D.at<double>(0,3);
+                Y = punto3D.at<double>(0,1)/punto3D.at<double>(0,3);
+                Z = punto3D.at<double>(0,2)/punto3D.at<double>(0,3);
+                W = punto3D.at<double>(0,3)/punto3D.at<double>(0,3);
+                
+                promX = promX + X;
+                promY = promY + Y;
+                promZ = promZ + Z;
+               
+            }else{
+                /*cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
+                cout<<"No hay informacion de disparity"<<endl;
+                cout<<"---------------------------------------------------------------------------------"<<endl;*/
+            }
+        }
+        promX = promX / size.height;
+        promY = promY / size.height;
+        promZ = promZ / size.height;
+        
+        cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
+        cout<<"X: "<<promX/1000<<" cm"<<endl;
+        cout<<"Y: "<<promY/1000<<" cm"<<endl;
+        cout<<"Z: "<<promZ/1000<<" cm"<<endl;
+        cout<<"---------------------------------------------------------------------------------"<<endl;
+        
+        promGeneralX = promGeneralX + promX;
+        promGeneralY = promGeneralY + promY;
+        promGeneralZ = promGeneralZ + promZ;
+    }
+    promGeneralX = promGeneralX / size.width;
+    promGeneralY = promGeneralY / size.width;
+    promGeneralZ = promGeneralZ / size.width;
+    
+    cout<<"PROMEDIO GENERAL"<<endl;
+    cout<<"X: "<<promGeneralX/1000<<" cm"<<endl;
+    cout<<"Y: "<<promGeneralY/1000<<" cm"<<endl;
+    cout<<"Z: "<<promGeneralZ/1000<<" cm"<<endl;
+    cout<<"---------------------------------------------------------------------------------"<<endl;
+    
+}
+
 void navegacion(Mat& disparityMap){
     cv::Mat roiTemp, roi;
-    mejorROI(disparityMap, roi);
-    //roi = disparityMap.rowRange(340,380);
+    //mejorROI(disparityMap, roi);
+    roi = disparityMap.rowRange(300,340);
+    puntosRoi(roi);
     //roi = roiTemp.colRange(0,640);
     
     Size size = roi.size();
@@ -353,7 +434,7 @@ void navegacion(Mat& disparityMap){
     
 	//pongamos una linea por donde iria
 
-    /*cv::Mat_<Vec3b> roiColor (roi.size());
+    cv::Mat_<Vec3b> roiColor (roi.size());
 	map2Color(roi, roiColor);
 
 	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
@@ -361,7 +442,51 @@ void navegacion(Mat& disparityMap){
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
     cv::imshow("imagencolor1",roiColor);
 
-    cv::waitKey(0);*/
+    cv::waitKey(0);
+}
+
+void navegacion2(Mat& disparityMap){
+    cv::Mat roiTemp, roi;
+    //mejorROI(disparityMap, roi);
+    roi = disparityMap.rowRange(340,380);
+    //roi = roiTemp.colRange(0,640);
+    
+    Size size = roi.size();
+    
+    cout<<"ancho: "<<size.width<<endl;
+    cout<<"alto: "<<size.height<<endl;
+    
+    double distancias [size.width];
+    
+    vectorDistancia(roi, distancias);
+    
+    /*for(int i = 0; i < size.width; i++ ){
+        cout<<i<<": "<<distancias[i]<<"\n";
+    }*/
+    
+    double angulo, distancia;
+    
+    int dir = buscarSalida(distancias, size.width, angulo, distancia);
+    pthread_t thread1;
+    girar(angulo);
+    //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
+    if(distancia > 0){
+        desplazarse(distancia, 1);
+    }else{
+        desplazarse(-distancia, -1);
+    }
+    
+	//pongamos una linea por donde iria
+
+    cv::Mat_<Vec3b> roiColor (roi.size());
+	map2Color(roi, roiColor);
+
+	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
+    
+    cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
+    cv::imshow("imagencolor1",roiColor);
+
+    cv::waitKey(0);
 }
 
 void calcularMapa(){
@@ -458,12 +583,12 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 1; i++){
         //sacamos las fotos
         if(not end){
-            //tomarImagenes(img_izq, img_der);
+            tomarImagenes(img_izq, img_der);
             //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-            capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
+            //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
             
             disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
             
@@ -476,14 +601,14 @@ int main(int argc, char *argv[]) {
             path += ".tiff";
             cv::imwrite(path, colorDispMap_left);
             
-            //cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
-            //cv::imshow("dispMapleft", colorDispMap_left);
+            cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
+            cv::imshow("dispMapleft", colorDispMap_left);
             
             navegacion(dispMap_left);
             
             numMov++;
             
-            //cv::waitKey(0);
+            cv::waitKey(0);
 
         }
         
