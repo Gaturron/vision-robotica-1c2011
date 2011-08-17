@@ -286,9 +286,29 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
 }
 
 int buscarSalida(double* distancias, int length, double& angulo, double& distancia){
-    int ancho_robot = calcularAnchoRobot(distancias, length);
-    cout<<"ancho_robot: "<<ancho_robot<<endl;
-    int indexDirection = -1;
+    //int ancho_robot = calcularAnchoRobot(distancias, length);
+	int ancho_robot = 1;    
+	//cout<<"ancho_robot: "<<ancho_robot<<endl;
+    
+	//recorro para ver si hay mas del 50% de negro o no
+	int cantValores = 0;	
+	int cantNegros = 0;	
+	for(int i = 0; i < length; i++) {
+		if(distancias[i] == 1000) {
+			cantNegros++;
+		} else {
+			cantValores++;
+		}
+	}
+
+	if(cantNegros > cantValores){
+		//politica de escape
+		distancia = 0;	
+		angulo = 30;
+		return 1; 
+	}
+
+	int indexDirection = -1;
     int indexDirectionTemp = 0;
     int indexlastNegativeValue;
     double salida, sum, mejorSalida;
