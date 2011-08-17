@@ -3,6 +3,7 @@
 
 const int AVANZAR = 0;
 const int ANGULO = 1;
+const int DISTANCIA_MAX = 2000;
 int* tipoMovs;
 double* movs;
 int numMov = 0;
@@ -160,21 +161,45 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     //cv::imwrite("test1.tiff", frame_der);
 }
 
+void ordenar(double* vector, int length){
+    double key;
+    int i;
+    for(int j=1;j<length;j++){
+        key=vector[j];
+        i=j-1;
+        while(vector[i]>key && i>=0){
+            vector[i+1]=vector[i];
+            i--;
+        }
+        vector[i+1]=key;
+    }
+
+}
+
 void vectorDistancia(Mat& roi, double* vector){
     Size size = roi.size();
-
-    double porcentaje;
-	double sum;
+    
+    double mediana;
+	double distancias [roi.rows];
 	double disparity;
     for(int j = 0; j < roi.cols; j++){
-        sum = 0.0;
         for(int i = 0; i < roi.rows; i++){
 			//aca hay que castear bien y hacer el promedio
             disparity = (double) roi.at<float>(i,j);
-            sum += disparity;
+            if(disparity > 0){
+                distancias[i] = disparity;
+            }else{
+                distancias[i] = DISTANCIA_MAX;
+            }
 		}
-        porcentaje = sum / roi.rows;
-		vector[j] = porcentaje;
+        ordenar(distancias, roi.rows);
+        int n;
+        n = roi.rows / 2; //estamos en el caso par; sino falla
+        mediana = (distancias[n-1] + distancias[n])/2;
+		vector[j] = mediana;
+    }
+    for(int k = 0 ; k < roi.cols; k++){
+        cout<<"vector["<<k<<"]: "<<vector[k]<<endl;
     }
 }
 
@@ -404,7 +429,7 @@ void navegacion(Mat& disparityMap){
     cv::Mat roiTemp, roi;
     //mejorROI(disparityMap, roi);
     roi = disparityMap.rowRange(300,340);
-    puntosRoi(roi);
+    //puntosRoi(roi);
     //roi = roiTemp.colRange(0,640);
     
     Size size = roi.size();
