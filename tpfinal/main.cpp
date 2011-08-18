@@ -426,17 +426,17 @@ void navegacion(Mat& disparityMap){
     
     int dir = buscarSalida(distancias, size.width, angulo, distancia);
     
-    //girar(angulo);
+    girar(angulo);
     //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
-    /*if(distancia > 0){
+    if(distancia > 0){
         desplazarse(distancia, 1);
     }else{
         desplazarse(-distancia, -1);
-    }*/
+    }
     
 	//pongamos una linea por donde iria
 
-    cv::Mat_<Vec3b> roiColor (roi.size());
+    /*cv::Mat_<Vec3b> roiColor (roi.size());
 	map2Color(roi, roiColor);
 
 	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
@@ -444,7 +444,7 @@ void navegacion(Mat& disparityMap){
     cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
     cv::imshow("imagencolor1",roiColor);
 
-    cv::waitKey(0);
+    cv::waitKey(0);*/
 }
 
 void calcularMapa(){
@@ -541,12 +541,12 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 10; i++){
         //sacamos las fotos
         if(not end){
-            tomarImagenes(img_izq, img_der);
+            //tomarImagenes(img_izq, img_der);
             //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-            //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
+            capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
             
             disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
             
@@ -559,14 +559,14 @@ int main(int argc, char *argv[]) {
             path += ".tiff";
             cv::imwrite(path, colorDispMap_left);
             
-            cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
-            cv::imshow("dispMapleft", colorDispMap_left);
+            //cv::namedWindow("dispMapleft", CV_WINDOW_AUTOSIZE);
+            //cv::imshow("dispMapleft", colorDispMap_left);
             
             navegacion(dispMap_left);
             
             numMov++;
             
-            cv::waitKey(0);
+            //cv::waitKey(0);
 
         }
         
