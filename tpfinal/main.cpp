@@ -358,7 +358,7 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
     if(mediana > 20){
 		//politica de escape
         cout<<"politica de escape"<<endl;
-		distancia = 5;	
+		distancia = 1;	
 		angulo = 30;
 		return 1; 
 	}
