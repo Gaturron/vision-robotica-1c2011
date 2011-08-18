@@ -1,5 +1,6 @@
 #include "vision.h"
 #include "libexabot-remote/libexabot-remote.h"
+#include <math.h>
 
 const int AVANZAR = 0;
 const int ANGULO = 1;
@@ -9,6 +10,7 @@ double* movs;
 int numMov = 0;
 double posActualx = 0;
 double posActualy = 0;
+double distmin = 30;
 cv::Mat Q;
 bool end = false;
 
@@ -67,6 +69,9 @@ cout <<"+" << "initRobotConf " << endl;
 
   rootConf["relAngIndex"] >> mat;
   relAnguloIndex = mat.at<double>(0,0);
+  
+  rootConf["distmin"] >> mat;
+  distmin = mat.at<double>(0,0);
 }
 
 void desplazarse(double distancia, int direccion){
@@ -85,7 +90,12 @@ cout <<"+" << "desplazar " << distancia * direccion << endl;
 
 void girar(double angulo){
   cout <<"+" << "girar " << angulo << endl;
-  double tiempo = cantDeSegPorCadaGrado * angulo;  
+    double tiempo;
+    if(angulo > 0){
+        tiempo = cantDeSegPorCadaGrado * angulo;
+    }else{
+        tiempo = cantDeSegPorCadaGrado * -angulo;
+    }
 	while (tiempo > 0 and not end) {
     if(angulo > 0){
       exa_remote_set_motors(-1 * velocidad, velocidad);
@@ -145,8 +155,8 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/testRobot/test1/rightcam_5.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/testRobot/test1/leftcam_5.tiff",1);
+    frame_der = cv::imread("/home/aolmedo/testRobot/test6/rightcam_3.tiff",1);
+    frame_izq = cv::imread("/home/aolmedo/testRobot/test6/leftcam_3.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -203,7 +213,7 @@ void vectorDistancia(Mat& roi, double* vector){
     }
 }
 
-int calcularAnchoRobot(double* distancias, int length){
+/*int calcularAnchoRobot(double* distancias, int length){
     double promedio, sum = 0;
     for(int i = 0; i < length; i++){
         if(distancias[i] >= 0){
@@ -213,13 +223,13 @@ int calcularAnchoRobot(double* distancias, int length){
     promedio = sum / length;
     return (int) (length / promedio);
 //	return 1;
-}
+}*/
 
-double calcularAnguloGiro(int indexDirection){
+double calcularAnguloGiro(double X, double Y, double Z){
     //dado el x donde f(x) indica la mejor salida tenemos que calcular el angulo de giro
     //este angulo ira de 0 a 90 o de -45 a 45 grados.
-    double angulo = 0.0;    
-    if(indexDirection < 0){
+   double angulo = 0.0;    
+    /*if(indexDirection < 0){
         //politica de escape
         angulo = 90;
         //girar(90);
@@ -231,14 +241,23 @@ double calcularAnguloGiro(int indexDirection){
     cout<<"angulo: "<<angulo<<endl;
     tipoMovs[numMov] = ANGULO;
     movs[numMov] = -angulo;
-    numMov++;
-    return -angulo;
+    numMov++;*/
+    angulo = asin(X/Z);
+    if(X > 0){
+        angulo = asin(X/Z);
+    }
+    else{
+        angulo = asin((-1 * X)/Z);
+        angulo = -angulo;
+    }
+    return angulo;
 }
 
-double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
+double calcularDistanciaArecorrer(double X, double Y, double Z){
+    double distance = sqrt(X*X + Y*Y + Z*Z);
     //tenemos que transformar el valor de disparidad en distancia
     //(igual no sabemos como se le indica la distancia a recorrer al robot)
-    double X, Y, Z, W;
+    /*double X, Y, Z, W;
     double x, y, d;
     
     cv::Size size = Size(1,4);
@@ -268,11 +287,11 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
         cout<<"Y: "<<Y/1000<<" cm"<<endl;
         cout<<"Z: "<<Z/1000<<" cm"<<endl;
         
-        /*if( coeficiente < 0.01){
+        if( coeficiente < 0.01){
             coeficiente = 0.01;
         }
         distance = 10 / coeficiente;
-        cout<<"distancia: "<<distance<<endl;*/
+        cout<<"distancia: "<<distance<<endl;
         tipoMovs[numMov] = AVANZAR;
         movs[numMov] = distance;
     }
@@ -281,7 +300,7 @@ double calcularDistanciaArecorrer(double mejorSalida, double max, int index){
         //no hace nada
         //girar(90);
     }
-    distance = Z/1000;
+    distance = Z/1000;*/
     return distance;
 }
 
@@ -294,155 +313,93 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
 	int cantValores = 0;	
 	int cantNegros = 0;	
 	for(int i = 0; i < length; i++) {
-		if(distancias[i] == 1000) {
+		if(distancias[i] == DISTANCIA_MAX) {
 			cantNegros++;
 		} else {
 			cantValores++;
 		}
 	}
 
+    cout<<"cantidad de pixels sin informacion: "<<cantNegros<<endl;
+    cout<<"cantidad de pixels con informacion: "<<cantValores<<endl;
+
 	if(cantNegros > cantValores){
 		//politica de escape
+        cout<<"politica de escape"<<endl;
 		distancia = 0;	
 		angulo = 30;
 		return 1; 
 	}
 
-	int indexDirection = -1;
-    int indexDirectionTemp = 0;
-    int indexlastNegativeValue;
-    double salida, sum, mejorSalida;
-    salida = 1000;
-    mejorSalida = 1000;
-    while(indexDirectionTemp < length - ancho_robot){
-        //cout<<indexDirectionTemp<<": "<<distancias[indexDirectionTemp]<<"\n";
-        if(distancias[indexDirectionTemp] >= 0){
-            //estos son los valores que me interesan. Los valores 
-            //negativos me indican que no tengo informacion disponible de ese punto.
-            indexlastNegativeValue = -1;
-            sum = 0.0;
-            for(int k = indexDirectionTemp; k < (indexDirectionTemp + ancho_robot); k++ ){
-                //cout<<"k: "<<k<<endl;
-                if(distancias[k] < 0){
-                    indexlastNegativeValue = k + 1;
-                }
-                sum += distancias[k];
-            }
-            //cout<<"indexlastNegativeValue: "<<indexlastNegativeValue<<endl;
-            if(indexlastNegativeValue >= 0){
-                //algun valor del subarreglo del tamaño del robot es negativo
-                //(es decir no tengo informacion del punto)
-                indexDirectionTemp = indexlastNegativeValue;
-            }
-            else{
-                //los valores del subarreglo del tamaño del robot son todos positivos
-                //(es decir tengo informacion del punto)
-                salida =  (sum / (double)ancho_robot);
-                //cout<<salida<<endl;
-                if(salida < mejorSalida){
-                    mejorSalida = salida;
-                    indexDirection = indexDirectionTemp;
-                }
-                indexDirectionTemp++;
-            }
-        }
-        else{
-            indexDirectionTemp++;
-        }
-    }
-    cout<<"indexDirection: "<<indexDirection<<" de "<<length<<endl;
-    cout<<"mejor salida(distancia mas lejana): "<<mejorSalida<<endl;
-    angulo = calcularAnguloGiro(indexDirection);
-    
-    double max = -1;
-    for(int i = 0; i < length; i++){
-        if(distancias[i] > max){
-            max = distancias[i];
-        }
-    }
-    
-    distancia = calcularDistanciaArecorrer(mejorSalida, max, indexDirection);
-	return indexDirection;
-}
-
-void puntosRoi(Mat& roi){
-    int roiStartY = 300;
     double X, Y, Z, W;
-    double promX = 0.0;
-    double promY = 0.0;
-    double promZ = 0.0;
-    double promW = 0.0;
+    double x, y, mediana;
+    int n = length/2;
+    cv::Size size = Size(1,4);
+    cv::Mat_<double> L(size);
+    cv::Mat_<double> punto3D(size);
     
-    double promGeneralX = 0.0;
-    double promGeneralY = 0.0;
-    double promGeneralZ = 0.0;
-    
-    cv::Size size2 = Size(1,4);
-    cv::Mat_<double> L(size2);
-    cv::Mat_<double> punto3D(size2);
-    
-    double disparity = 0;
-    int x, y;
-    Size size = roi.size();
-    
-    cout<<"ancho roi: "<<size.width<<endl;
-    cout<<"alto roi: "<<size.height<<endl;
-    
-    for(x = 0; x < size.width; x++){
-        //me muevo en x (ancho)
-        for(y = 0; y < size.height; y++){
-            //me muevo en y (alto)
-            //cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
-            //cout<<"ANTES DE DISPARITY"<<endl;
-            disparity = roi.at<double>(x, y);
-            //cout<<"disparity: "<<disparity<<endl;
-            
-            if(disparity >= 0.1){
-                L.at<double>(0,0) = x;
-                L.at<double>(0,1) = roiStartY + y;
-                L.at<double>(0,2) = disparity;
-                L.at<double>(0,3) = 1;
-                punto3D = Q * L;
-                
-                X = punto3D.at<double>(0,0)/punto3D.at<double>(0,3);
-                Y = punto3D.at<double>(0,1)/punto3D.at<double>(0,3);
-                Z = punto3D.at<double>(0,2)/punto3D.at<double>(0,3);
-                W = punto3D.at<double>(0,3)/punto3D.at<double>(0,3);
-                
-                promX = promX + X;
-                promY = promY + Y;
-                promZ = promZ + Z;
-               
-            }else{
-                /*cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
-                cout<<"No hay informacion de disparity"<<endl;
-                cout<<"---------------------------------------------------------------------------------"<<endl;*/
-            }
-        }
-        promX = promX / size.height;
-        promY = promY / size.height;
-        promZ = promZ / size.height;
-        
-        cout<<"COLUMNA: "<<x<<" FILA: "<<y<<endl;
-        cout<<"X: "<<promX/1000<<" cm"<<endl;
-        cout<<"Y: "<<promY/1000<<" cm"<<endl;
-        cout<<"Z: "<<promZ/1000<<" cm"<<endl;
-        cout<<"---------------------------------------------------------------------------------"<<endl;
-        
-        promGeneralX = promGeneralX + promX;
-        promGeneralY = promGeneralY + promY;
-        promGeneralZ = promGeneralZ + promZ;
+    double disparidades [length];
+    for(int k = 0; k < length; k++){
+        disparidades[k] = distancias[k];
     }
-    promGeneralX = promGeneralX / size.width;
-    promGeneralY = promGeneralY / size.width;
-    promGeneralZ = promGeneralZ / size.width;
     
-    cout<<"PROMEDIO GENERAL"<<endl;
-    cout<<"X: "<<promGeneralX/1000<<" cm"<<endl;
-    cout<<"Y: "<<promGeneralY/1000<<" cm"<<endl;
-    cout<<"Z: "<<promGeneralZ/1000<<" cm"<<endl;
-    cout<<"---------------------------------------------------------------------------------"<<endl;
+    ordenar(disparidades, length);
+    mediana = disparidades[n-1];
     
+    double minDisparity = DISTANCIA_MAX;
+    int indexMin = -1;
+    
+    for(int i = 0; i < length; i++){
+        if(distancias[i] == mediana){
+            indexMin = i;
+        }
+    }
+    
+    if(mediana > 20){
+		//politica de escape
+        cout<<"politica de escape"<<endl;
+		distancia = 5;	
+		angulo = 30;
+		return 1; 
+	}
+    
+    for(int i = 0; i < length; i++){
+        if(distancias[i] < minDisparity){
+            minDisparity = distancias[i];
+            indexMin = i;
+        }
+    }
+    
+    cout<<"index: "<<indexMin<<endl;
+    cout<<"valor de disparidad minimo: "<<minDisparity<<endl;
+    x = indexMin;
+    y = 320;
+    
+    L.at<double>(0,0) = x;
+    L.at<double>(0,1) = y;
+    L.at<double>(0,2) = minDisparity;
+    L.at<double>(0,3) = 1;
+    
+    punto3D = Q * L;
+    
+    X = punto3D.at<double>(0,0)/punto3D.at<double>(0,3);
+    Y = punto3D.at<double>(0,1)/punto3D.at<double>(0,3);
+    Z = punto3D.at<double>(0,2)/punto3D.at<double>(0,3);
+    W = punto3D.at<double>(0,3)/punto3D.at<double>(0,3);
+    
+    cout<<"X: "<<X/1000<<" cm"<<endl;
+    cout<<"Y: "<<Y/1000<<" cm"<<endl;
+    cout<<"Z: "<<Z/1000<<" cm"<<endl;
+    
+    angulo = calcularAnguloGiro(X, Y, Z);
+    cout<<"angulo: "<<angulo<<endl;
+    if( (Z/1000) > distmin){
+        distancia = (Z/1000) - distmin;
+    }else{
+        distancia = 0;
+    }
+    //distancia = calcularDistanciaArecorrer(X, Y, Z);
+    cout<<"distancia: "<<distancia<<endl;
 }
 
 void navegacion(Mat& disparityMap){
@@ -468,58 +425,14 @@ void navegacion(Mat& disparityMap){
     double angulo, distancia;
     
     int dir = buscarSalida(distancias, size.width, angulo, distancia);
-    pthread_t thread1;
-    girar(angulo);
+    
+    //girar(angulo);
     //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
-    if(distancia > 0){
+    /*if(distancia > 0){
         desplazarse(distancia, 1);
     }else{
         desplazarse(-distancia, -1);
-    }
-    
-	//pongamos una linea por donde iria
-
-    cv::Mat_<Vec3b> roiColor (roi.size());
-	map2Color(roi, roiColor);
-
-	cv::line(roiColor, cv::Point2f((float) dir, 0.0), cv::Point2f((float) dir, 100.0), CV_RGB(255, 255, 255));	
-    
-    cv::namedWindow("imagencolor1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("imagencolor1",roiColor);
-
-    cv::waitKey(0);
-}
-
-void navegacion2(Mat& disparityMap){
-    cv::Mat roiTemp, roi;
-    //mejorROI(disparityMap, roi);
-    roi = disparityMap.rowRange(340,380);
-    //roi = roiTemp.colRange(0,640);
-    
-    Size size = roi.size();
-    
-    cout<<"ancho: "<<size.width<<endl;
-    cout<<"alto: "<<size.height<<endl;
-    
-    double distancias [size.width];
-    
-    vectorDistancia(roi, distancias);
-    
-    /*for(int i = 0; i < size.width; i++ ){
-        cout<<i<<": "<<distancias[i]<<"\n";
     }*/
-    
-    double angulo, distancia;
-    
-    int dir = buscarSalida(distancias, size.width, angulo, distancia);
-    pthread_t thread1;
-    girar(angulo);
-    //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
-    if(distancia > 0){
-        desplazarse(distancia, 1);
-    }else{
-        desplazarse(-distancia, -1);
-    }
     
 	//pongamos una linea por donde iria
 

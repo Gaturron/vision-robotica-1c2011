@@ -32,4 +32,12 @@
                         0.140625
                 </data>
         </relAngIndex>
+    <!--distancia minima en centimetros que tiene que haber entre los objetos y el robot para que funciones-->
+        <distmin type_id="opencv-matrix">
+                <rows>1</rows> <cols>1</cols>
+                <dt>d</dt>
+                <data>
+                        30
+                </data>
+        </distmin>
 </opencv_storage>
