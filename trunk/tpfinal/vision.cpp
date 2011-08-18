@@ -192,10 +192,10 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
 	dims[2] = grayIm1_rect.cols;
 	//cout << mapDis1.cols << " " << mapDis1.rows << endl;
     
-    /*equalizeHist(grayIm1_rect, grayIm1_rect2);
+    equalizeHist(grayIm1_rect, grayIm1_rect2);
     equalizeHist(grayIm2_rect, grayIm2_rect2);
     
-    cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
+    /*cv::namedWindow("hist1", CV_WINDOW_AUTOSIZE);
     cv::imshow("hist1",grayIm1_rect2);
     
     cv::namedWindow("hist2", CV_WINDOW_AUTOSIZE);
@@ -205,7 +205,7 @@ void disparity(const Mat& img1, const Mat& img2, const Mat& mapx1, const Mat& ma
     Elas::parameters param;
     //param.postprocess_only_left = false;
     Elas elas(param);
-    elas.process(grayIm2_rect.data,grayIm1_rect.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
+    elas.process(grayIm2_rect2.data,grayIm1_rect2.data,(float*)mapDis1.data,(float*)mapDis2.data,dims);
 
     /*cv::Mat_<Vec3b> l1 (mapDis1.size()), l2 (mapDis2.size());
     
