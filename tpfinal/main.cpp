@@ -155,8 +155,10 @@ void tomarImagenes(Mat& img_izq, Mat& img_der){
     
     cv::Mat_<Vec3b> frame_izq, frame_der;
     
-    frame_der = cv::imread("/home/aolmedo/testRobot/test6/rightcam_3.tiff",1);
-    frame_izq = cv::imread("/home/aolmedo/testRobot/test6/leftcam_3.tiff",1);
+    //frame_der = cv::imread("/home/aolmedo/testRobot/test6/rightcam_3.tiff",1);
+	frame_der = cv::imread("/home/fer/vision-robotica-1c2011/tpfinal/fotos/test2/rightcam_4.tiff",1);
+    //frame_izq = cv::imread("/home/aolmedo/testRobot/test6/leftcam_3.tiff",1);
+    frame_izq = cv::imread("/home/fer/vision-robotica-1c2011/tpfinal/fotos/test2/leftcam_4.tiff",1);
     
     //cap1.open(0);
     //cap2.open(1);
@@ -323,9 +325,12 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
     cout<<"cantidad de pixels sin informacion: "<<cantNegros<<endl;
     cout<<"cantidad de pixels con informacion: "<<cantValores<<endl;
 
-	if(cantNegros > cantValores){
+	double relacion = (double) cantValores / (double) length;
+	cout<<"relacion entre pixels con valores/totales: "<<relacion<<endl;	
+	
+	if(relacion < 0.5){
 		//politica de escape
-        cout<<"politica de escape"<<endl;
+        cout<<"politica de escape por falta de informacion"<<endl;
 		distancia = 0;	
 		angulo = 30;
 		return 1; 
@@ -541,12 +546,12 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 1; i++){
         //sacamos las fotos
         if(not end){
-            //tomarImagenes(img_izq, img_der);
+            tomarImagenes(img_izq, img_der);
             //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-            capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
+            //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
             
             disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
             
