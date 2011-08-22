@@ -409,7 +409,7 @@
 % \url{my_url_here}.
 
 
-\usepackage[latin1]{inputenc}
+\usepackage[latin1, utf8]{inputenc}
 
 
 % *** Do not adjust lengths that control margins, column widths, etc. ***
@@ -427,7 +427,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Algoritmos de navegaci髇 para robots m髒iles usando visi髇 est閞eo}
+\title{Algoritmos de navegaci贸n para robots m贸viles usando visi贸n est茅reo}
 %
 %
 % author names and IEEE memberships
@@ -451,9 +451,9 @@
 % journal papers have the author affiliations above the "Manuscript
 % received ..."  text while in non-compsoc journals this is reversed. Sigh.
 
-\author{Fernando~Bugni,~\IEEEmembership{Estudiante,~UBA,}
-        Amit~Stein,~\IEEEmembership{Estudiante,~UBA,}
-        and~Agust韓~Olmedo,~\IEEEmembership{Estudiante,~UBA}% <-this % stops a space
+\author{Agust铆n~Olmedo,~\IEEEmembership{Estudiante,~UBA}\linebreak 
+        Amit~Stein,~\IEEEmembership{Estudiante,~UBA,}\linebreak
+        and~Fernando~Bugni,~\IEEEmembership{Estudiante,~UBA,}% <-this % stops a space
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem M. Shell is with the Department
 of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
 GA, 30332.\protect\\
@@ -485,7 +485,7 @@ E-mail: see http://www.michaelshell.org/contact.html
 
 % The paper headers
 %\markboth{Journal of \LaTeX\ Class Files,~Vol.~6, No.~1, January~2007}%
-%{Shell \MakeLowercase{\textit{et al.}}: Algoritmos de navegaci髇 para robots m髒iles usando visi髇 est閞eo}
+%{Shell \MakeLowercase{\textit{et al.}}: Algoritmos de navegaci锟絥 para robots m锟絭iles usando visi锟絥 est锟絩eo}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 % 
@@ -523,7 +523,7 @@ E-mail: see http://www.michaelshell.org/contact.html
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 %\boldmath
-The abstract goes here.
+El presente trabajo desarrolla una implemetaci贸n para la navegaci贸n de un robot utilizando visi贸n est茅reo. 脡l m铆smo utiliza conceptos sobre vision computacional: calibraci贸n est茅reo, mapa de disparidad, rectificaci贸n. La implementaci贸n fue desarrollada integramente en C++ utilizando la libreria OpenCV, adem谩s de otras librerias para la movilidad del robot.  
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -535,7 +535,7 @@ The abstract goes here.
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Computer Society, IEEEtran, journal, \LaTeX, paper, template.
+Computer Society, \LaTeX, Visi贸n Computacional, OpenCV, Mapas de Disparidad
 \end{IEEEkeywords}}
 
 
@@ -567,7 +567,7 @@ Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 
 
 
-\section{Introducci髇}
+\section{Introducci贸n}
 % Computer Society journal papers do something a tad strange with the very
 % first section heading (almost always called "Introduction"). They place it
 % ABOVE the main text! IEEEtran.cls currently does not do this for you.
@@ -604,25 +604,20 @@ Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 % 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
-for IEEE Computer Society journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
+\IEEEPARstart{E}{n} este informe vamos a ver todos los pasos realizados para hacer una navegaci贸n de un robot utilizando mapas de disparidad. Mostraremos todas las ideas que nos surgieron realizando el trabajo, as铆 como tambi茅n los problemas y como los fuimos resolviendo. Por 煤ltimo, dejaremos ideas para alguna posible continuaci贸n de este trabajo. 
 
-\hfill mds
+%\hfill mds
  
-\hfill Agosto 11, 2011
+%\hfill Agosto 11, 2011
 
-%\section{M閠odos propuestos}
-%M閠odos propuestos.
+%\section{M锟絫odos propuestos}
+%M锟絫odos propuestos.
 
-\section{Calibraci髇 de la camara est閞eo}
+\section{Calibraci贸n de la camara est茅reo}
 
 \section{Mapas de disparidad}
 
-\section{Navegaci髇 para robot m髒iles utilizando los mapas de disparidad}
+\section{Navegaci贸n para robot m贸viles utilizando los mapas de disparidad}
 
 \section{Experimentos}
 Experimentos.
