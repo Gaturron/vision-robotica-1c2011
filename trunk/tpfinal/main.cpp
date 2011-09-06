@@ -360,7 +360,7 @@ int buscarSalida(double* distancias, int length, double& angulo, double& distanc
         }
     }
     
-    if(mediana > 20){
+    if(mediana > 30){
 		//politica de escape
         cout<<"politica de escape"<<endl;
 		distancia = 1;	
@@ -546,17 +546,20 @@ int main(int argc, char *argv[]) {
     
     //Empieza el ciclo que realiza el proceso de navegación
     //Ahora es un for pero despues cambiara.
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 20; i++){
         //sacamos las fotos
         if(not end){
-            tomarImagenes(img_izq, img_der);
+            //tomarImagenes(img_izq, img_der);
             //capturarImagenesDesdeVideo(img_izq, img_der, 100);
-            //capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
+            capturarImagenes(deviceCamLeft.c_str(), deviceCamRight.c_str(), img_izq, img_der, i);
             
             disparity(img_izq, img_der, mapx1, mapy1, mapx2, mapy2, dispMap_left, dispMap_right);    
             
             cv::Mat_<Vec3b> colorDispMap_left (dispMap_left.size());
             map2Color(dispMap_left, colorDispMap_left);
+            
+            cv::line(colorDispMap_left, cv::Point2f(0.0, 299.0), cv::Point2f(640.0, 299.0), CV_RGB(255, 255, 255));
+            cv::line(colorDispMap_left, cv::Point2f(0.0, 341.0), cv::Point2f(640.0, 341.0), CV_RGB(255, 255, 255));
             
             convertir(i, numImg);
             path = "disparityLeft_";
