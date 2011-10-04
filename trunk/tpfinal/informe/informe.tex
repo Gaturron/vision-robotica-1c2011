@@ -603,7 +603,7 @@ Computer Society, \LaTeX, Visión Computacional, OpenCV, Mapas de Disparidad
 % 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{E}{n} este informe vamos a ver todos los pasos realizados para hacer una navegación de un robot utilizando mapas de disparidad. Mostraremos todas las ideas que nos surgieron realizando el trabajo, así como también los problemas y como los fuimos resolviendo. Por último, dejaremos ideas para alguna posible continuación de este trabajo.
+\IEEEPARstart{E}{n} este informe vamos a mostrar el desarrollo de un algoritmo para realizar la navegación de un robot. Un algoritmo de este tipo puede utilizar varias distintas tecnicas, nosotros nos enfocamos fuertemente en la utilización de mapas de disparidad. Mostraremos las distintas etapas realizadas para lograr la navegación. Explicaremos todas las ideas que nos surgieron realizando el trabajo, así como también los problemas y como los fuimos resolviendo. Por último, dejaremos ideas para alguna posible continuación.
 
 explicacion del problema
 
@@ -615,6 +615,12 @@ explicacion del problema
 %M�todos propuestos.
 
 \section{Calibración de la camara estéreo}
+
+Como dijimos anteriormente, vamos a utilizar fuertemente mapa de disparidad. Para ello necesitamos calibrar las camaras utilizadas. La razón por la cual calibramos es para obtener datos feacientes (reales) de las distancias de las camaras, ya sea en profundidad como también sobre el plano proyectado. La calibración se realiza en dos etapas: 
+
+Primera: se realiza calibracion sobre el plano proyectado. Para ello se utiliza un damero de 10 cm y tomamos distintas fotografias moviendo la perspectiva del damero. Luego con la herramienta Matlab marcamos las distintas puntas del damero de cada fotografia. Procesamos estas imagenes con la herramienta y nos devuelve los parametros incrinsicos (CHEQUEAR) de la camara. Estos nos serviran para poder vincular un punto de una imagen con correspondencia con el otro.
+
+Segundo: se realiza calibración sobre dos imagenes tomadas en el momento de utilizar el programa de navegación. Esto se realiza para poder saber la profundidad obtenida por las camaras. Esto se debe realizar en cada momento de correr el software porque varia considerablemente el mapa de disparidad. Si este paso esta descalibrado; el mapa de disparidad, que es la base del algoritmo, va a mostrar datos erroneos.  
 
 mencion de la herramienta: poner link
 
