@@ -622,7 +622,15 @@ La calibración de una camara es el procedimiento por el cual obtenemos los par�
 
 Los parámetros intrinsecos de una camara son los atributos que posee la misma, como la distancia focal, punto principal, distorción de los lentes, etc.
 
-Por otro lado, los parámetros extrínsecos relaciona el sistema de coordenadas del mundo al de la camara.Estos se utilizan para formar la trnasformación que mapea los puntos 3D del mundo a los 2D de la camara.
+Por otro lado, los parámetros extrínsecos relaciona el sistema de coordenadas del mundo al de la camara.Estos se utilizan para formar la transformación que mapea los puntos 3D del mundo a los 2D de la camara.
+
+Una vez que obtenemos los parámetros intrínsecos y extrínsecos, podemos decir que la cámara esta calibrada, pudiendo representar cualquier punto del mundo real sobre el plano 2D de la cámara.
+
+Para el desarrollo del presente trabajo utilizamos una camara estéreo, con lo cual no nos alcanza solo con calibrar cada una de las cámaras, además debemos calibrar las dos camaras de forma conjunta. A esto se lo denomina calibración estéreo.
+
+La calibración estéreo nos provee los parámetros intrínsecos de cada cámara (que son los obtenidos en la calibración de cada una) y los parámetros extrínsecos, que nos definen la posición relativa de las cámaras.
+
+Para realizar dicha calibración utilizamos un toolbox para matlab http://www.vision.caltech.edu/bouguetj/calib_doc/.
 
 Como dijimos anteriormente, vamos a utilizar fuertemente mapa de disparidad. Para ello necesitamos calibrar las camaras utilizadas. La razón por la cual calibramos es para obtener datos feacientes (reales) de las distancias de las camaras, ya sea en profundidad como también sobre el plano proyectado. La calibración se realiza en dos etapas: 
 
