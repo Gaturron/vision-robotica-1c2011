@@ -67,6 +67,9 @@
 % The Computer Society usually requires 12pt for submissions.
 %
 \documentclass[10pt,journal,compsoc]{IEEEtran}
+
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
 %
 % If IEEEtran.cls has not been installed into the LaTeX system files,
 % manually specify the path to it like:
@@ -408,9 +411,6 @@
 % \url{my_url_here}.
 
 
-\usepackage[latin1, utf8]{inputenc}
-
-
 % *** Do not adjust lengths that control margins, column widths, etc. ***
 % *** Do not use packages that alter fonts (such as pslatex).         ***
 % There should be no need to do such things with IEEEtran.cls V1.6 and later.
@@ -426,7 +426,8 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Algoritmos de navegaciÃ³n para robots mÃ³viles usando visiÃ³n estÃ©reo}
+%\title{Aplicación visión estéreo en la navegación de robots móviles}
+\title{Algoritmos de navegación para robots móviles usando visión estéreo}
 %
 %
 % author names and IEEE memberships
@@ -450,18 +451,19 @@
 % journal papers have the author affiliations above the "Manuscript
 % received ..."  text while in non-compsoc journals this is reversed. Sigh.
 
-\author{AgustÃ­n~Olmedo,~\IEEEmembership{Estudiante,~UBA}\linebreak 
-        Amit~Stein,~\IEEEmembership{Estudiante,~UBA,}\linebreak
-        and~Fernando~Bugni,~\IEEEmembership{Estudiante,~UBA,}% <-this % stops a space
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem M. Shell is with the Department
-of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
-GA, 30332.\protect\\
+\author{Agustín Olmedo,\IEEEmembership{Estudiante, UBA}\linebreak 
+        Amit Stein,\IEEEmembership{Estudiante, UBA,}\linebreak
+        y Fernando Bugni, \IEEEmembership{Estudiante, UBA,}% <-this % stops a space
+        }
+%\IEEEcompsocitemizethanks{}% <-this % stops a space
+%\thanks{}%\IEEEcompsocthanksitem M. Shell is with the Department
+%of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
+%GA, 30332.\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
-E-mail: see http://www.michaelshell.org/contact.html
-\IEEEcompsocthanksitem J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
-\thanks{Manuscript received April 19, 2005; revised January 11, 2007.}}
-
+%E-mail: see http://www.michaelshell.org/contact.html
+%\IEEEcompsocthanksitem J. Doe and J. Doe are with Anonymous University.
+%Manuscript received April 19, 2005; revised January 11, 2007.
 % note the % following the last \IEEEmembership and also \thanks - 
 % these prevent an unwanted space from occurring between the last author name
 % and the end of the author line. i.e., if you had this:
@@ -522,7 +524,7 @@ E-mail: see http://www.michaelshell.org/contact.html
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 %\boldmath
-El presente trabajo desarrolla una implemetaciÃ³n para la navegaciÃ³n de un robot utilizando visiÃ³n estÃ©reo. Ã‰l mÃ­smo utiliza conceptos sobre vision computacional: calibraciÃ³n estÃ©reo, mapa de disparidad, rectificaciÃ³n. La implementaciÃ³n fue desarrollada integramente en C++ utilizando la libreria OpenCV, ademÃ¡s de otras librerias para la movilidad del robot.  
+El presente trabajo desarrolla una implemetación para la navegación de un robot utilizando visión estéreo. Al mísmo utiliza conceptos sobre vision computacional: calibración estéreo, mapa de disparidad, rectificación. La implementación fue desarrollada integramente en C++ utilizando la libreria OpenCV, además de otras librerias para la movilidad del robot.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -534,7 +536,7 @@ El presente trabajo desarrolla una implemetaciÃ³n para la navegaciÃ³n de un robo
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Computer Society, \LaTeX, VisiÃ³n Computacional, OpenCV, Mapas de Disparidad
+Computer Society, \LaTeX, Visión Computacional, OpenCV, Mapas de Disparidad
 \end{IEEEkeywords}}
 
 
@@ -564,114 +566,180 @@ Computer Society, \LaTeX, VisiÃ³n Computacional, OpenCV, Mapas de Disparidad
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
 
+\section{Introducción}
 
+\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. La utilización de esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, asistencia para personas con discapacidades e inclusive como guias en una exposición.
 
-\section{IntroducciÃ³n}
-% Computer Society journal papers do something a tad strange with the very
-% first section heading (almost always called "Introduction"). They place it
-% ABOVE the main text! IEEEtran.cls currently does not do this for you.
-% However, You can achieve this effect by making LaTeX jump through some
-% hoops via something like:
-%
-%\ifCLASSOPTIONcompsoc
-%  \noindent\raisebox{2\baselineskip}[0pt][0pt]%
-%  {\parbox{\columnwidth}{\section{Introduction}\label{sec:introduction}%
-%  \global\everypar=\everypar}}%
-%  \vspace{-1\baselineskip}\vspace{-\parskip}\par
-%\else
-%  \section{Introduction}\label{sec:introduction}\par
-%\fi
-%
-% Admittedly, this is a hack and may well be fragile, but seems to do the
-% trick for me. Note the need to keep any \label that may be used right
-% after \section in the above as the hack puts \section within a raised box.
+El objetivo del presente trabajo es desarrollar un algoritmo de navegación de robots utilizando visión estéreo. En la actualidad, existen diversas técnicas de visión por computadora que nos brindan la información necesaria sobre el entorno en el que se encuentra el robot para que este pueda tomar la mejor decisión posible. Algunos ejemplos de estas técnicas son: utilización de cámaras tipo eyebird enfocando todo el terreno, generación de mapas a través de las imágenes tomadas o también reconocimiento de objetos a través de imágenes. El enfoque de este trabajo consiste, principalmente, en utilizar mapas de disparidad para obtener información sobre la distancia entre el robot y los objetos que luego será utilizada por el robot para decidir el próximo movimiento a realizar. Un paper que ha influido fuertemente el presente trabajo fue \"Region of Interest in Disparity Mapping for Navigation of Stereo Vision Autonomous Guided Vehicle\". Este paper posee un enfoque similar a este, en cuanto a las técnicas de visión utilizadas. Las diferencias radican en la interpretación de la información que nos brindan los mapas de disparidad.
 
+El presente trabajo describe los fundamentos teóricos y prácticos utilizados para lograr la navegación de un robot, en particular del exabot (poner link, foto o alguna referencia). Cabe destacar que el entorno utilizado juega un papel fundamental en el buen desempeño del algoritmo, utilizamos un entorno llano iluminado para no perder ningún dato al tomar cada fotografía. La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y rotar sobre su propio eje.
 
+Por último, dejaremos ideas para alguna posible continuación.
 
-% The very first letter is a 2 line initial drop letter followed
-% by the rest of the first word in caps (small caps for compsoc).
-% 
-% form to use if the first word consists of a single letter:
-% \IEEEPARstart{A}{demo} file is ....
-% 
-% form to use if you need the single drop letter followed by
-% normal text (unknown if ever used by IEEE):
-% \IEEEPARstart{A}{}demo file is ....
-% 
-% Some journals put the first two words in caps:
-% \IEEEPARstart{T}{his demo} file is ....
-% 
-% Here we have the typical use of a "T" for an initial drop letter
-% and "HIS" in caps to complete the first word.
-\IEEEPARstart{L}{a} navegaciÃ³n de robots es el Ã¡rea encargada de desarrollar robots capaces de desplazarse de forma autonoma. 
+palabras clave: explicacion del problema, estado del arte (antes hablar del arte),
+entorno de prueba, approach del paper, arquitectura de hardware
 
-En el presente trabajo vamos a mostrar el desarrollo de un algoritmo para realizar la navegaciÃ³n de un robot. Un algoritmo de este tipo puede utilizar varias distintas tecnicas, nosotros nos enfocamos fuertemente en la utilizaciÃ³n de mapas de disparidad. Mostraremos las distintas etapas realizadas para lograr la navegaciÃ³n. Explicaremos todas las ideas que nos surgieron realizando el trabajo, asÃ­ como tambiÃ©n los problemas y como los fuimos resolviendo. Por Ãºltimo, dejaremos ideas para alguna posible continuaciÃ³n.
+\section{Calibración de la cámara estéreo}
+Cuando capturamos una escena del mundo (tres dimensiones) con una cámara, ésta se proyecta sobre una imagen en dos dimensiones.\\
+Para conocer la posición de cada punto es necesario definir un sistema de referencias, es decir, los tres ejes principales con su origen, sus orientaciones y sus unidades.
 
-explicacion del problema
+Existen tres sistemas de referencias posibles:
+\begin{itemize}
+	\item El sistema del mundo: independiente de la cámara. Unidades físicas, por ejemplo, metros.
+	\item El sistema de la cámara: origen en el centro óptico. Unidades físicas.
+	\item El sistema de la imagen: origen en la esquina de la imagen. Unidades en pixeles.
+\end{itemize}
 
-approach del paper
+Los parámetros intrínsecos son los que relacionan el sistema de referencia de la cámara con el sistema de referencia de la imagen y los parámetros extrínsecos son los que relacionan el sistema de referencia del mundo con el sistema de referencia de la cámara.
 
-estado del arte (antes hablar del arte)
+El sistema de referencia de la cámara y el sistema de referencia del mundo tienen las mismas unidades. Lo que cambia es el origen y la orientación de los ejes. Esto significa que la conversión de un sistema al otro  implica una traslación (cambio de origen) y una rotación (cambio de orientación).Ver figura 1.
 
-entorno de prueba
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig9.png}
+		\caption{Parámetros extrínsecos}
+\end{figure}
 
-arquitectura de hardware
+Por otro lado, el sistema de referencia de la cámara y el sistema de referencia de la imagen no tienen las mismas unidades. Con lo cual hay que realizar un cambio de unidad, dividiendo por el tamaño del pixel. Además hay que cambiar el lugar del origen sumando la posición del centro de la imagen. Ver figura 2.
 
+Los parámetros intrínsecos de una cámara son los atributos que posee la misma, como la distancia focal, punto principal, skew,  distorción de los lentes, etc.
 
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig8.png}
+	\caption{Parámetros intrínsecos}
+\end{figure}
+%La cámara y el mundo tienen medidas fisicas como por ejemplo: metros.
+%La imagen tiene medidas en pixeles.
 
-%\hfill mds
- 
-%\hfill Agosto 11, 2011
+La calibración de una cámara es el procedimiento por el cual obtenemos los parámetros intrínsecos y extrínsecos de la cámara a partir de imágenes tomadas por la misma.
 
-%\section{Mï¿½todos propuestos}
-%Mï¿½todos propuestos.
+%Por otro lado, los parámetros extrínsecos relaciona el sistema de coordenadas del mundo al de la camara. Estos se utilizan %para formar la transformación que mapea los puntos 3D del mundo, a los puntos 2D de la cámara.
 
-\section{CalibraciÃ³n de la camara estÃ©reo}
+Una vez que obtenemos los parámetros intrínsecos y extrínsecos, podemos decir que la
+cámara esta calibrada, pudiendo representar cualquier punto del mundo real sobre el plano 2D de la cámara.
 
-La calibraciÃ³n de una camara es el procedimiento por el cual obtenemos los parÃ¡metros intrÃ­nsecos y extrÃ­nsecos de la camara a partir de las fotos tomadas por la misma.
+%{explicacion de cada figura y decir que si no calibramos cada punto proyectado no se reflejaria bien en la camara, decir que %usamos una camara pinhole}
 
-Los parÃ¡metros intrinsecos de una camara son los atributos que posee la misma, como la distancia focal, punto principal, distorciÃ³n de los lentes, etc.
+Para el desarrollo del presente trabajo utilizamos una camara estéreo, con lo cual no nos alcanza solo con calibrar cada una de las cámaras, sino que además debemos calibrar las dos cámaras de forma conjunta. A esto se lo denomina calibración estéreo.
 
-Por otro lado, los parÃ¡metros extrÃ­nsecos relaciona el sistema de coordenadas del mundo al de la camara.Estos se utilizan para formar la transformaciÃ³n que mapea los puntos 3D del mundo a los 2D de la camara.
+La calibración estéreo nos provee los parámetros intrínsecos de cada cámara (que son los obtenidos en la calibración de cada una) y los parámetros extrínsecos, que nos definen la posición relativa de las cámaras.
 
-Una vez que obtenemos los parÃ¡metros intrÃ­nsecos y extrÃ­nsecos, podemos decir que la cÃ¡mara esta calibrada, pudiendo representar cualquier punto del mundo real sobre el plano 2D de la cÃ¡mara.
+Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras para matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib\_doc/}. Dicha herramienta necesita una serie de fotos para realizar la calibración.
 
-Para el desarrollo del presente trabajo utilizamos una camara estÃ©reo, con lo cual no nos alcanza solo con calibrar cada una de las cÃ¡maras, ademÃ¡s debemos calibrar las dos camaras de forma conjunta. A esto se lo denomina calibraciÃ³n estÃ©reo.
+%Como dijimos anteriormente, vamos a utilizar fuertemente mapa de disparidad. Para ello necesitamos calibrar las camaras %utilizadas. La razón por la cual calibramos es para obtener datos feacientes (reales) de las distancias de las camaras, ya sea %en profundidad como también sobre el plano proyectado. La calibración se realiza en dos etapas:
 
-La calibraciÃ³n estÃ©reo nos provee los parÃ¡metros intrÃ­nsecos de cada cÃ¡mara (que son los obtenidos en la calibraciÃ³n de cada una) y los parÃ¡metros extrÃ­nsecos, que nos definen la posiciÃ³n relativa de las cÃ¡maras.
+%Primera: se realiza calibracion sobre el plano proyectado. Para ello se utiliza un damero de 30 cm y tomamos distintas %fotografias moviendo la perspectiva del damero. Luego con la herramienta Matlab marcamos las distintas puntas del damero de %cada fotografia. Procesamos estas imagenes con la herramienta y nos devuelve los parametros incrinsicos (CHEQUEAR) de la %camara. Estos nos serviran para poder vincular un punto de una imagen con correspondencia con el otro.
 
-Para realizar dicha calibraciÃ³n utilizamos un toolbox de calibraciÃ³n de cÃ¡maras para matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib_doc/}. Dicha herramienta neesita una serie de fotos para realizar la calibraciÃ³n. 
+%Segundo: se realiza calibración sobre dos imagenes tomadas en el momento de utilizar el programa de navegación. Esto se %realiza para poder saber la profundidad obtenida por las camaras. Esto se debe realizar en cada momento de correr el software %porque varia considerablemente el mapa de disparidad. Si este paso esta descalibrado; el mapa de disparidad, que es la base %del algoritmo, va a mostrar datos erroneos.  
 
+%mencion de la herramienta: poner link
 
+%Importancia de la calibracion:
+%1 porq hay q calibrar las camaras
+%2 parametros intrinsicos extrinsicos
+\section{Imagen estéreo}
+Al proyectarse los objetos, de un espacio tridimensional a una imagen bidimensional se pierde la información de la distancia a la cámara o profundidad (eje Z) de cada punto. Una forma de tratar de recuperar esta información es mediante el uso de dos cámaras, en lo que se conoce como visión estéreo.
 
-Como dijimos anteriormente, vamos a utilizar fuertemente mapa de disparidad. Para ello necesitamos calibrar las camaras utilizadas. La razÃ³n por la cual calibramos es para obtener datos feacientes (reales) de las distancias de las camaras, ya sea en profundidad como tambiÃ©n sobre el plano proyectado. La calibraciÃ³n se realiza en dos etapas: 
-
-Primera: se realiza calibracion sobre el plano proyectado. Para ello se utiliza un damero de 30 cm y tomamos distintas fotografias moviendo la perspectiva del damero. Luego con la herramienta Matlab marcamos las distintas puntas del damero de cada fotografia. Procesamos estas imagenes con la herramienta y nos devuelve los parametros incrinsicos (CHEQUEAR) de la camara. Estos nos serviran para poder vincular un punto de una imagen con correspondencia con el otro.
-
-Segundo: se realiza calibraciÃ³n sobre dos imagenes tomadas en el momento de utilizar el programa de navegaciÃ³n. Esto se realiza para poder saber la profundidad obtenida por las camaras. Esto se debe realizar en cada momento de correr el software porque varia considerablemente el mapa de disparidad. Si este paso esta descalibrado; el mapa de disparidad, que es la base del algoritmo, va a mostrar datos erroneos.  
-
-mencion de la herramienta: poner link
-
-Importancia de la calibracion:
-1 porq hay q calibrar las camaras
-2 parametros intrinsicos extrinsicos
-
+Libelas\footnote{http://www.rainsoft.de/software/libelas.html}
+(basado en Learing Open cv pag 415 Stereo Imaging)
 \section{Mapas de disparidad}
+
+Un mapa de disparidad representa la distancia que existe entre el centro de las camara y
+<despues de leer lo explico bien>
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig1.png}
+	\caption{figura 1:}
+	\label{fig:fig1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig2.png}
+	\label{fig:fig1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig3.png}
+	\label{fig:fig1}
+\end{figure}
+
+
+\subsection{Calculo del mapa de disparidad}
+
+En esta seccion explicaremos los pasos ha realizar para obtener un mapa de disparidad  a partir de dos imágenes capturadas por la cámara estéreo.
+
+Básicamente, se buscan correspondencias entre los puntos que se encuentran en una imagen y los mismos puntos en la otra imagen. Con estas correspondencias y conocienfo la distancia entre las camaras(linea base) podemos calcular la ubicacion en 3 dimensiones de los puntos.
+
+Para conseguir el mejor resultado posible eliminaremos la distorsion radial y tangencial de las imagenes obtenidas con la camara minoru. Ademas  se ajusta los angulos y distancias entre las camaras para que los planos de las imagenes queden coplanares. A este ultimo paso se lo conoce con el nombre de rectificacion. (mejorar)
+
+
+
+
+
+una vez que tenemos las dos imágenes utilizamos la información de las dos imágenes capturadas para encontrar las correspondencias entre ellas, como lo realiza nuestra vista.
+
+Los pasos son:
+
+1 - Remover distorsiones radiales y tangenciales del lente; este proceso se llama (en ingles) undistortion
+
+2 - Ajustar los ángulos y distancias entre imágenes; este proceso se llama rectificación. En este paso ya obtenemos imágenes rectificadas y alineadas
+
+3 - Encontrar iguales puntos en las dos imágenes, esto se llama correspondencia. La salida de este proceso es una imagen llamada mapa de disparidad, donde la disparidad se refiere a la diferencia entre las dos imágenes en un mismo punto.
+
+4 - Por ultimo, podemos pasar el mapa de disparidad a distancias utilizando triangulación; este proceso se llama reproyección y la salida es una imagen con profundidad.
+
+Realizamos estos pasos utilizando fuertemente la librería Open CV. Esta librería nos facilita mucho la realización de cada uno de ellos. Vamos a dedicarnos fuertemente en explicar como utilizamos el mapa de disparidad.     
+
+\subsection{Mapas de disparidad}
+
+(agregar imagenes 12-5 pag 417 libro open cv y 12-6 pag 418 del mismo libro, tambien puede ir la imagen 12-4)
+
+Realizando los pasos anteriores sucesivamente obtenemos el mapa de disparidad. Dicha imagen nos permite utilizar la información obtenida de las dos imágenes para saber la profundidad de cada objeto (o punto??). Veamos el concepto que se utiliza para poder armar esta imagen.
+
+Asumamos que la imagen no posee distorsión y esta rectificada. En la figura (12-6) podemos ver la representación de la visión estéreo. Los puntos Ol y Or representan los centros de la cámara izquierda y derecha respectivamente. Los puntos pl y pr son los proyectados en cada imagen respectivamente y corresponden a un unico punto P. Este punto debe ser alineado por las dos imágenes. Si definimos como xl y xr como las coordenadas de x en cada punto respectivamente, podemos definir disparidad como d = xl - xr.
+
+Utilizando geometría podemos calcular la distancia Z, que es inversamente proporcional al valor de disparidad. Podemos apreciar esto en la figura (12-5). Si la distancia del objeto es mayor, el valor de disparidad va a ser mas chico. Por ejemplo, si vemos un objeto a mucha distancia, la visión de cada imagen va a ver ese objeto sin poda diferencia, es por eso que su disparidad tiende a cero. Ocurre lo contrario si el objeto esta mas cercano. La relación de estas dos variables claramente no es lineal.
+
+Cabe aclarar que para obtener buenos resultados se debe sacar las imágenes al mismo tiempo así como también rectificarlas.
+
+\subsection{Geometría epipolar}
+
+(agregamos figura 12-8 del mismo libro)
+
+Para entender un poco mas como encuentra la relación entre cada punto que representan el mismo objeto vamos a ver la geometría se sucede en las cámaras. La figura (12-8) nos muestra los planos que observa cada cámara y su relación con el punto en común P. Lo mas interesante es ver que para todo punto que se ve en las dos imágenes existe una linea epipolar que atraviesa por un punto epipolo y que tiene su correlación en la otra imagen. Esta es la base de la correspondencia entre cada imagen.
+
+Cada punto en 3D visto desde las cámaras esta contenido en un plano epipolar que intersecta cada imagen en la linea epipolar. Cuando un punto se corresponde con otro en la otra imagen debe apoyarse sobre su linea epipolar correspondiente. Gracias a esta regla, la búsqueda de cada punto con respecto a su correspondencia en la otra imagen se reduce de una búsqueda en dos dimensiones a una busqueda en una dimension , o sea sobre una linea. Esto reduce el computo significativamente.  
+
+(redactar mejor , la idea es esa)
+     
 
 introduccion: para que nos sirve el mapa de disparidad
 
 geometria epipolar:
-  grafico geometria epipolar con su explicaciÃ³m
+ grafico geometria epipolar con su explicacióm
 
 como calculamos (como lo hace libelas) el mapa de disparidad (la teoria)
 
 mencionar libelas (referencia)
 
-
 teoria 417 open cv
 implementacion 438 ... 442
 
-\section{NavegaciÃ³n para robot mÃ³viles utilizando los mapas de disparidad}
+\section{Navegación para robot móviles utilizando los mapas de disparidad}
+
+Una vez que obtuvimos el mapa de disparidad debemos correr nuestro algoritmo de navegación. Dado un mapa de disparidad, vamos a explicar paso a paso que haría con ella.
+
+Sobre toda la imagen de disparidad nos quedamos con una región. Esta región esta determinada entre las filas 300 y 340 de la imagen. Este corte horizontal lo utilizamos para poder decidir para que lugar moverse. Realizamos varios experimentos y llegamos a la conclusión de que es la mejor region para definir el posible camino dada la arquitectura y las condiciones utilizadas. Esta región la llamaremos región de interes, con esta vamos a continuar con los pasos de navegacion.
+
+Cuando obtuvimos esta porción de imagen, vamos a procesarla para poder tomar una decisión con respecto a la navegación. Recorremos toda la imagen por columnas realizando la mediana de los datos por cada columna de información. (tenemos que hacer un grafico de esto.) Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. Realizamos distintos experimentos y llegamos a la conclusion que la mediana  representa bastante bien la distancia de cada columna. En un principio utilizamos el promedio de los valores pero fue descartado por lo siguiente: Supongamos que poseemos 1/3 de la columna con pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna de informacion. Si utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos elementos del medio vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que nos inclinamos a utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y pudimos evitarlo de esta forma.
+
+Luego de realizado este procesamiento sobre cada columna de la imagen, obtenemos un array de todas las distancias sugeridas por cada columna.
+
+Si no se obtiene una cadena de datos con información suficiente como para elegir un camino a seguir, el algoritmo define una política de escape.
 
 region de interes
 funcion de mediana
@@ -695,223 +763,12 @@ experimentos
 chamuyo
 mapas vistos de arriba
 mejorar algunas cosas
-utilizar la informaciÃ³n obtenidas de las imÃ¡genes anteriores para tomar mejores decisiones.(con objetos fijos)
+utilizar la información obtenidas de las imágenes anteriores para tomar mejores decisiones.(con objetos fijos)
 thread(futuro cercano y lejano a la vez)
-
-% An example of a floating figure using the graphicx package.
-% Note that \label must occur AFTER (or within) \caption.
-% For figures, \caption should occur after the \includegraphics.
-% Note that IEEEtran v1.7 and later has special internal code that
-% is designed to preserve the operation of \label within \caption
-% even when the captionsoff option is in effect. However, because
-% of issues like this, it may be the safest practice to put all your
-% \label just after \caption rather than within \caption{}.
-%
-% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
-% option should be used if it is desired that the figures are to be
-% displayed while in draft mode.
-%
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{myfigure}
-% where an .eps filename suffix will be assumed under latex, 
-% and a .pdf suffix will be assumed for pdflatex; or what has been declared
-% via \DeclareGraphicsExtensions.
-%\caption{Simulation Results}
-%\label{fig_sim}
-%\end{figure}
-
-% Note that IEEE typically puts floats only at the top, even when this
-% results in a large percentage of a column being occupied by floats.
-% However, the Computer Society has been known to put floats at the bottom.
-
-
-% An example of a double column floating figure using two subfigures.
-% (The subfig.sty package must be loaded for this to work.)
-% The subfigure \label commands are set within each subfloat command, the
-% \label for the overall figure must come after \caption.
-% \hfil must be used as a separator to get equal spacing.
-% The subfigure.sty package works much the same way, except \subfigure is
-% used instead of \subfloat.
-%
-%\begin{figure*}[!t]
-%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-%\label{fig_second_case}}}
-%\caption{Simulation results}
-%\label{fig_sim}
-%\end{figure*}
-%
-% Note that often IEEE papers with subfigures do not employ subfigure
-% captions (using the optional argument to \subfloat), but instead will
-% reference/describe all of them (a), (b), etc., within the main caption.
-
-
-% An example of a floating table. Note that, for IEEE style tables, the 
-% \caption command should come BEFORE the table. Table text will default to
-% \footnotesize as IEEE normally uses this smaller font for tables.
-% The \label must come after \caption as always.
-%
-%\begin{table}[!t]
-%% increase table row spacing, adjust to taste
-%\renewcommand{\arraystretch}{1.3}
-% if using array.sty, it might be a good idea to tweak the value of
-% \extrarowheight as needed to properly center the text within the cells
-%\caption{An Example of a Table}
-%\label{table_example}
-%\centering
-%% Some packages, such as MDW tools, offer better commands for making tables
-%% than the plain LaTeX2e tabular which is used here.
-%\begin{tabular}{|c||c|}
-%\hline
-%One & Two\\
-%\hline
-%Three & Four\\
-%\hline
-%\end{tabular}
-%\end{table}
-
-
-% Note that IEEE does not put floats in the very first column - or typically
-% anywhere on the first page for that matter. Also, in-text middle ("here")
-% positioning is not used. Most IEEE journals use top floats exclusively.
-% However, Computer Society journals sometimes do use bottom floats - bear
-% this in mind when choosing appropriate optional arguments for the
-% figure/table environments.
-% Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
-% floats. This can be corrected via the \fnbelowfloat command of the
-% stfloats package.
 
 
 
 \section{Conclusion}
 The conclusion goes here.
 
-
-
-
-
-% if have a single appendix:
-%\appendix[Proof of the Zonklar Equations]
-% or
-%\appendix  % for no appendix heading
-% do not use \section anymore after \appendix, only \section*
-% is possibly needed
-
-% use appendices with more than one appendix
-% then use \section to start each appendix
-% you must declare a \section before using any
-% \subsection or using \label (\appendices by itself
-% starts a section numbered zero.)
-%
-
-
-%\appendices
-%\section{Proof of the First Zonklar Equation}
-%Appendix one text goes here.
-
-% you can choose not to have a title for an appendix
-% if you want by leaving the argument blank
-%\section{}
-%Appendix two text goes here.
-
-
-% use section* for acknowledgement
-%\ifCLASSOPTIONcompsoc
-  % The Computer Society usually uses the plural form
-%  \section*{Acknowledgments}
-%\else
-  % regular IEEE prefers the singular form
-%  \section*{Acknowledgment}
-%\fi
-
-
-%The authors would like to thank...
-
-
-% Can use something like this to put references on a page
-% by themselves when using endfloat and the captionsoff option.
-%\ifCLASSOPTIONcaptionsoff
-%  \newpage
-%\fi
-
-
-
-% trigger a \newpage just before the given reference
-% number - used to balance the columns on the last page
-% adjust value as needed - may need to be readjusted if
-% the document is modified later
-%\IEEEtriggeratref{8}
-% The "triggered" command can be changed if desired:
-%\IEEEtriggercmd{\enlargethispage{-5in}}
-
-% references section
-
-% can use a bibliography generated by BibTeX as a .bbl file
-% BibTeX documentation can be easily obtained at:
-% http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
-% The IEEEtran BibTeX style support page is at:
-% http://www.michaelshell.org/tex/ieeetran/bibtex/
-%\bibliographystyle{IEEEtran}
-% argument is your BibTeX string definitions and bibliography database(s)
-%\bibliography{IEEEabrv,../bib/paper}
-%
-% <OR> manually copy in the resultant .bbl file
-% set second argument of \begin to the number of references
-% (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-
-\end{thebibliography}
-
-% biography section
-% 
-% If you have an EPS/PDF photo (graphicx package needed) extra braces are
-% needed around the contents of the optional argument to biography to prevent
-% the LaTeX parser from getting confused when it sees the complicated
-% \includegraphics command within an optional argument. (You could create
-% your own custom macro containing the \includegraphics command to make things
-% simpler here.)
-%\begin{biography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
-% or if you just want to reserve a space for a photo:
-
-%\begin{IEEEbiography}{Michael Shell}
-%Biography text here.
-%\end{IEEEbiography}
-
-% if you will not have a photo at all:
-%\begin{IEEEbiographynophoto}{John Doe}
-%Biography text here.
-%\end{IEEEbiographynophoto}
-
-% insert where needed to balance the two columns on the last page with
-% biographies
-%\newpage
-
-%\begin{IEEEbiographynophoto}{Jane Doe}
-%Biography text here.
-%\end{IEEEbiographynophoto}
-
-% You can push biographies down or up by placing
-% a \vfill before or after them. The appropriate
-% use of \vfill depends on what kind of text is
-% on the last page and whether or not the columns
-% are being equalized.
-
-%\vfill
-
-% Can be used to pull up biographies so that the bottom of the last one
-% is flush with the other column.
-%\enlargethispage{-5in}
-
-
-
-% that's all folks
 \end{document}
-
-
