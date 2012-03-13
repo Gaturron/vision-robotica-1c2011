@@ -568,16 +568,30 @@ Computer Society, \LaTeX, Visión Computacional, OpenCV, Mapas de Disparidad
 
 \section{Introducción}
 
-\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. La utilización de esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, asistencia para personas con discapacidades e inclusive como guias en una exposición.
+\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. Esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, asistencia para personas con discapacidades e inclusive como guias en una exposición.
 
-El objetivo del presente trabajo es desarrollar un algoritmo de navegación de robots utilizando visión estéreo. En la actualidad, existen diversas técnicas de visión por computadora que nos brindan la información necesaria sobre el entorno en el que se encuentra el robot para que este pueda tomar la mejor decisión posible. Algunos ejemplos de estas técnicas son: utilización de cámaras tipo eyebird enfocando todo el terreno, generación de mapas a través de las imágenes tomadas o también reconocimiento de objetos a través de imágenes. El enfoque de este trabajo consiste, principalmente, en utilizar mapas de disparidad para obtener información sobre la distancia entre el robot y los objetos que luego será utilizada por el robot para decidir el próximo movimiento a realizar. Un paper que ha influido fuertemente el presente trabajo fue \"Region of Interest in Disparity Mapping for Navigation of Stereo Vision Autonomous Guided Vehicle\". Este paper posee un enfoque similar a este, en cuanto a las técnicas de visión utilizadas. Las diferencias radican en la interpretación de la información que nos brindan los mapas de disparidad.
+En particular en el presente trabajo desarrollaremos un algoritmo de navegación de robots utilizando visión estéreo. En la actualidad, existen diversas técnicas de visión por computadora que nos brindan la información necesaria sobre el entorno. Entre ellas se encuentra la visión estéreo que utiliza dos cámaras para obtener datos de los puntos en tres dimensiones. Algunas aplicaciones de estas técnicas son: construcción de mapas de un entorno desconocido, localización, reconstrucción 3D o también reconocimiento de objetos.
 
-El presente trabajo describe los fundamentos teóricos y prácticos utilizados para lograr la navegación de un robot, en particular del exabot (poner link, foto o alguna referencia). Cabe destacar que el entorno utilizado juega un papel fundamental en el buen desempeño del algoritmo, utilizamos un entorno llano iluminado para no perder ningún dato al tomar cada fotografía. La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y rotar sobre su propio eje.
+%El presente trabajo describe los fundamentos teóricos y prácticos utilizados para lograr la navegación de un robot, en %particular del exabot (poner link, foto o alguna referencia).
 
-Por último, dejaremos ideas para alguna posible continuación.
+El enfoque de este trabajo consiste, principalmente, en utilizar visión estéreo para calcular el mapa de disparidad asociado a la escena capturada por las dos cámaras. Con la información de disparidad podemos obtener la distancia entre el robot y los objetos que luego será utilizada por el robot para decidir el próximo movimiento a realizar. 
 
-palabras clave: explicacion del problema, estado del arte (antes hablar del arte),
-entorno de prueba, approach del paper, arquitectura de hardware
+Un paper que ha influido fuertemente el presente trabajo fue "Region of Interest in Disparity Mapping for Navigation of Stereo Vision Autonomous Guided Vehicle". El mismo posee un enfoque similar en cuanto a las técnicas de visión utilizadas. Las diferencias radican en la interpretación de la información que nos brindan los mapas de disparidad.
+
+La organización del paper sigue el orden cronológico en que fuimos aplicando los distintos pasos, empezando con la calibración y calibracón estéreo, luego explicamos los conceptos necesarios para entender de que forma utilizamos la visión estéreo para obtener la información necesaria para realizar el algoritmo de navegación propuesto; continuando con la explicación del algoritmo de navegación. Por último, se incluye una sección de experimentos donde se explica brevemente los experimentos realizado, la arquitectura del robot que se ha usado en los experimentos y las limitaciones del algoritmo.
+
+%\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. %La utilización de esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, %asistencia para personas con discapacidades e inclusive como guias en una exposición.
+
+%El objetivo del presente trabajo es desarrollar un algoritmo de navegación de robots utilizando visión estéreo. En la %actualidad, existen diversas técnicas de visión por computadora que nos brindan la información necesaria sobre el entorno en %el que se encuentra el robot para que este pueda tomar la mejor decisión posible. Algunos ejemplos de estas técnicas son: %utilización de cámaras tipo eyebird enfocando todo el terreno, generación de mapas a través de las imágenes tomadas o también %reconocimiento de objetos a través de imágenes. El enfoque de este trabajo consiste, principalmente, en utilizar mapas de %disparidad para obtener información sobre la distancia entre el robot y los objetos que luego será utilizada por el robot para %decidir el próximo movimiento a realizar. Un paper que ha influido fuertemente el presente trabajo fue \"Region of Interest in %Disparity Mapping for Navigation of Stereo Vision Autonomous Guided Vehicle\". Este paper posee un enfoque similar a este, en %cuanto a las técnicas de visión utilizadas. Las diferencias radican en la interpretación de la información que nos brindan los %mapas de disparidad.
+
+%El presente trabajo describe los fundamentos teóricos y prácticos utilizados para lograr la navegación de un robot, en %particular del exabot (poner link, foto o alguna referencia). Cabe destacar que el entorno utilizado juega un papel %fundamental en el buen desempeño del algoritmo, utilizamos un entorno llano iluminado para no perder ningún dato al tomar cada %fotografía. La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y %rotar sobre su propio eje.
+
+%Por último, dejaremos ideas para alguna posible continuación.
+
+%Escribir un parrafo de guia de todos los pasos realizados (a grandes rasgos)
+
+%palabras clave: explicacion del problema, estado del arte (antes hablar del arte),
+%entorno de prueba, approach del paper, arquitectura de hardware
 
 \section{Calibración de la cámara estéreo}
 Cuando capturamos una escena del mundo (tres dimensiones) con una cámara, ésta se proyecta sobre una imagen en dos dimensiones.\\
@@ -585,30 +599,51 @@ Para conocer la posición de cada punto es necesario definir un sistema de refere
 
 Existen tres sistemas de referencias posibles:
 \begin{itemize}
-	\item El sistema del mundo: independiente de la cámara. Unidades físicas, por ejemplo, metros.
-	\item El sistema de la cámara: origen en el centro óptico. Unidades físicas.
-	\item El sistema de la imagen: origen en la esquina de la imagen. Unidades en pixeles.
+	\item El sistema del mundo 
+	%independiente de la cámara. Unidades físicas, por ejemplo, metros.
+	\item El sistema de la cámara
+	%origen en el centro óptico. Unidades físicas.
+	\item El sistema de la imagen
+	%origen en la esquina de la imagen. Unidades en pixel
 \end{itemize}
 
-Los parámetros intrínsecos son los que relacionan el sistema de referencia de la cámara con el sistema de referencia de la imagen y los parámetros extrínsecos son los que relacionan el sistema de referencia del mundo con el sistema de referencia de la cámara.
+La unidad del sistema de referencia de la imagen es el pixel, mientras que en los demás es el metro. El sistema de la cámara tiene el origen en el centro óptico y el de la imagen en la esquina de la misma.
 
-El sistema de referencia de la cámara y el sistema de referencia del mundo tienen las mismas unidades. Lo que cambia es el origen y la orientación de los ejes. Esto significa que la conversión de un sistema al otro  implica una traslación (cambio de origen) y una rotación (cambio de orientación).Ver figura 1.
-
-\begin{figure}[h]
-	\centering
-		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig9.png}
-		\caption{Parámetros extrínsecos}
-\end{figure}
-
-Por otro lado, el sistema de referencia de la cámara y el sistema de referencia de la imagen no tienen las mismas unidades. Con lo cual hay que realizar un cambio de unidad, dividiendo por el tamaño del pixel. Además hay que cambiar el lugar del origen sumando la posición del centro de la imagen. Ver figura 2.
-
-Los parámetros intrínsecos de una cámara son los atributos que posee la misma, como la distancia focal, punto principal, skew,  distorción de los lentes, etc.
+Los parámetros intrínsecos son los que relacionan el sistema de referencia de la cámara con el de la imagen y los extrínsecos son los que relacionan el sistema de referencia del mundo con el de la cámara.
 
 \begin{figure}[h]
 	\centering
-		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig8.png}
-	\caption{Parámetros intrínsecos}
+		\includegraphics[width=0.50\textwidth]{./figuras/fig10.png}
+	\caption{Relación entre sistemas de referencias}
+	\label{fig:fig10}
 \end{figure}
+
+
+%\begin{center}
+	%Mundo $\stackrel{parametros\\extrinsecos}{\leftrightarrow}$ Cámara $\stackrel{parametros intrinsecos}{\leftrightarrow}$ Imagen
+%\end{center}
+
+%El sistema de referencia de la cámara y el sistema de referencia del mundo tienen las mismas unidades. Lo que cambia es el %origen y la orientación de los ejes. Esto significa que la conversión de un sistema al otro  implica una traslación (cambio de %origen) y una rotación (cambio de orientación).Ver figura 1.
+
+La conversión del sistema de referencia del mundo al de la cámara implica una traslación y una rotación.
+
+%\begin{figure}[h]
+%	\centering
+%		\includegraphics[width=0.50\textwidth]{./figuras/fig9.png}
+%		\caption{Parámetros extrínsecos}
+%\end{figure}
+%el sistema de referencia de la cámara y el sistema de referencia de la imagen no tienen las mismas unidades.
+Un punto en el mundo, visto desde la cámara, se proyecta en el plano de la imagen. Geometricamente podemos calcular la relación entre el punto en el mundo y el punto proyectado en el plano de la imagen(Ver figura 2).
+Además se traslada el origen del plano de la imagen llevandolo al centro, y se realiza un cambio de unidad dividiendo por el número de pixels por unidad de distancia.
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{./figuras/fig8.png}
+	\caption{\footnotesize\textit{Parámetros intrínsecos: El punto en el mundo $(X, Y, Z)^{T}$ visto desde la cámara se proyecta en el plano de la imagen como $(fX/Z, fY/Z)^{T}$}}
+\end{figure}
+
+Con lo cual los parámetros intrínsecos son: la distancia focal, el punto principal y se agregan el skew (pixel oblicuo), y la distorción de los lentes, etc.
+
 %La cámara y el mundo tienen medidas fisicas como por ejemplo: metros.
 %La imagen tiene medidas en pixeles.
 
@@ -617,7 +652,7 @@ La calibración de una cámara es el procedimiento por el cual obtenemos los parám
 %Por otro lado, los parámetros extrínsecos relaciona el sistema de coordenadas del mundo al de la camara. Estos se utilizan %para formar la transformación que mapea los puntos 3D del mundo, a los puntos 2D de la cámara.
 
 Una vez que obtenemos los parámetros intrínsecos y extrínsecos, podemos decir que la
-cámara esta calibrada, pudiendo representar cualquier punto del mundo real sobre el plano 2D de la cámara.
+cámara esta calibrada, pudiendo relacionar cualquier punto del mundo real con los puntos proyectados en el plano de la imagen.
 
 %{explicacion de cada figura y decir que si no calibramos cada punto proyectado no se reflejaria bien en la camara, decir que %usamos una camara pinhole}
 
@@ -625,7 +660,9 @@ Para el desarrollo del presente trabajo utilizamos una camara estéreo, con lo cu
 
 La calibración estéreo nos provee los parámetros intrínsecos de cada cámara (que son los obtenidos en la calibración de cada una) y los parámetros extrínsecos, que nos definen la posición relativa de las cámaras.
 
-Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras para matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib\_doc/}. Dicha herramienta necesita una serie de fotos para realizar la calibración.
+Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras para matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib\_doc/}. Esta herramienta utiliza un patrón plano. El mismo debe contener cuadrados blancos y negros intercalados de un cierto tamaño conocido. El proceso del toolbox consiste en capturar imágenes de este patrón desde distintos angulos y luego marcar las cuatro esquinas del patrón en cada una de ellas.
+
+%necesita una serie de fotos para realizar la calibración.
 
 %Como dijimos anteriormente, vamos a utilizar fuertemente mapa de disparidad. Para ello necesitamos calibrar las camaras %utilizadas. La razón por la cual calibramos es para obtener datos feacientes (reales) de las distancias de las camaras, ya sea %en profundidad como también sobre el plano proyectado. La calibración se realiza en dos etapas:
 
@@ -641,134 +678,256 @@ Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras 
 \section{Imagen estéreo}
 Al proyectarse los objetos, de un espacio tridimensional a una imagen bidimensional se pierde la información de la distancia a la cámara o profundidad (eje Z) de cada punto. Una forma de tratar de recuperar esta información es mediante el uso de dos cámaras, en lo que se conoce como visión estéreo.
 
-Libelas\footnote{http://www.rainsoft.de/software/libelas.html}
-(basado en Learing Open cv pag 415 Stereo Imaging)
-\section{Mapas de disparidad}
+A continuación explicaremos la configuración geométrica que se aplica en el campo de visión estéreo. La misma se conoce como geometría epipolar.
 
-Un mapa de disparidad representa la distancia que existe entre el centro de las camara y
-<despues de leer lo explico bien>
+\subsection{Geometría epipolar}
+
+%(agregamos figura 12-8 del mismo libro)
+
+%Para entender un poco mas como encuentra la relación entre cada punto que representan el mismo objeto vamos a ver la geometría %se sucede en las cámaras. 
+La geometría epipolar posee dos sistemas de referencias, uno por cada cámara, y surgen dos puntos importantes llamados epipolos. Un epipolo es la imagen del centro óptico de una de las cámaras con respecto a la otra (ver figura 5).
 
 \begin{figure}[h]
 	\centering
-		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig1.png}
+		\includegraphics[width=0.50\textwidth]{./figuras/fig11.png}
+	\caption{Geometría epipolar}
+	\label{3.1}
+\end{figure}
+
+La línea que intersecta los dos centros ópticos $O_{l}$ y $O_{r}$ se llama línea base. Además los epipolos $e_{l}$ y $e_{r}$ surgen de la intersección de la línea base con el plano de la imagen de cada cámara.
+
+Los puntos $O_{l}$, $O_{r}$ y $P$ definen un plano llamado plano epipolar. Las proyecciones $p_{l}$ y $p_{r}$ así como los epilpolos $e_{l}$ y $e_{r}$ pertenecen al plano epipolar. 
+
+Las líneas epipolares son las intersecciones del plano epipolar con los planos de las imagen de cada cámara. Para cualquier plano epipolar, las líneas epipolares incluyen los epipolos.
+
+La imagen de las ubicaciones posible de un punto visto en una de las imágenes es la línea que va desde el correspondiente punto y el punto epipolar en la otra imagen. Es decir, viendo la figura 6 el punto $X$ en el mundo va a estar proyectado en la imagen, de la cámara derecha, en la línea epipolar $l^{'}$. Esta es la utilidad de los epipolos.
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.25\textwidth]{./figuras/fig4.png}
+	\caption{Geometría epipolar}
+	\label{3.1}
+\end{figure}
+
+%Dado un único punto P en el mundo puede ser representado por dos vectores diferentes uno en cada sistema de referencia.
+%El punto P resulta en dos puntos proyectados, uno en cada imagen.
+%Un punto p de la imagen 1 puede ser la proyección de cualquier punto $P_{1}$, $P_{2}$, etc. de la línea $O_{1}P$. Entonces el %punto correspondiente en la imagen 2 debe ser una de las proyecciones $p_{1}$, $p_{2}$, etc. El conjunto de esos puntos %posibles en la imagen 2 se llama línea epipolar. De manera similar se obtiene una línea epipolar en la imagen 1.
+
+%Las líneas epipolares son las intersecciones del plano epipolar con los planos de las imagen de cada cámara.
+
+%Un epipolo es la intersección de todas las líneas epipolares de una imagen.
+
+%La figura 3.1 nos muestra los planos que observa cada cámara y su relación con el punto en común P. Lo mas interesante es ver %que para todo punto que se ve en las dos imágenes existe una linea epipolar que atraviesa por un punto epipolo y que tiene su %correlación en la otra imagen. Esta es la base de la correspondencia entre cada imagen.
+
+%Cada punto en 3D visto desde las cámaras esta contenido en un plano epipolar que intersecta cada imagen en la linea epipolar. %Cuando un punto se corresponde con otro en la otra imagen debe apoyarse sobre su linea epipolar correspondiente. Gracias a %esta regla, la búsqueda de cada punto con respecto a su correspondencia en la otra imagen se reduce de una búsqueda en dos %dimensiones a una busqueda en una dimension , o sea sobre una linea. Esto reduce el computo significativamente.  
+
+%(redactar mejor , la idea es esa)
+     
+
+%introduccion: para que nos sirve el mapa de disparidad
+
+%geometria epipolar:
+% grafico geometria epipolar con su explicacióm
+
+%como calculamos (como lo hace libelas) el mapa de disparidad (la teoria)
+
+%mencionar libelas (referencia)
+
+%teoria 417 open cv
+%implementacion 438 ... 442
+
+
+%Libelas\footnote{http://www.rainsoft.de/software/libelas.html}
+%(basado en Learing Open cv pag 415 Stereo Imaging)
+
+\subsection{Mapas de disparidad}
+
+%(agregar imagenes 12-5 pag 417 libro open cv y 12-6 pag 418 del mismo libro, tambien puede ir la imagen 12-4)
+El algoritmo de navegación realizado en el presente trabajo utiliza información de la profundidad que existe entre los puntos del mundo y las cámaras, precisamente al centro óptico de las mismas.
+%la distancia que existe entre los puntos del mundo y los centros ópticos de las cámaras.
+
+Una forma de obtener la distancia a la que se sitúa físicamente un objeto en el mundo con respecto a las dos cámaras, consiste en identificar en ambas imágenes aquellos píxeles que se corresponden con la misma entidad física en la escena 3D para luego hallar la distancia que separa estos píxeles. Esto es lo que se conoce como disparidad.
+
+Para calcular la disparidad hemos usado la libreira Libelas\footnote{http://www.rainsoft.de/software/libelas.html}(Library for Efficient Large-scale Stereo Matching). Básicamente, lo que hace esta librería es buscar los descriptores característicos de cada imagen con una implementación del algoritmo SURF\footnote{ftp://ftp.vision.ee.ethz.ch/publications/articles/eth\_biwi\_00517.pdf}(Speeded Up Robust Features) para luego buscar las correspondencias entre los puntos encontrados en el paso anterior. Con lo cual, la disparidad es d = $x_{l}$ - $x_{r}$ donde $x_{l}$ y $x_{r}$ son las correspondencias entre los puntos de cada imagen. 
+
+%una vez que calculamos la disparidad utilizando geometría podemos calcular la distancia Z,
+
+Luego, conociendo el valor de disparidad y la distancia entre los centros ópticos de las cámaras(línea base) podemos calcular la profundidad de los puntos usando triangulos semejantes (ver figura 3.2).
+
+\[
+\frac{T - (x_{l} - x_{r})}{Z - f} =\frac{T}{Z} \Rightarrow Z = \frac{fT}{x_{l} - x_{r}} \Rightarrow Z = \frac{fT}{d}
+\]
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{./figuras/fig1.png}
 	\caption{figura 1:}
 	\label{fig:fig1}
 \end{figure}
 
-\begin{figure}[h]
-	\centering
-		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig2.png}
-	\label{fig:fig1}
-\end{figure}
+De la fórmula anterior podemos observar que la distancia de un punto a las cámaras es inversamente proporcional al valor de disparidad (ver figura 3.3). Si el valor de disparidad es cercano a cero, pequeñas diferencias en la disparidad producen grandes diferencias en la profundidad. Y si la disparidad es grande pequeñas diferencias en la disparidad no producen diferencias en la profundidad. La relación de estas dos variables es claramente no lineal.
+
+Con lo cual, si el valor de disparidad es muy pequeño o muy grande la disparidad no nos dice mucho sobre la profundidad a la que se encuentra el objeto de las cámaras. En consecuencia los sistemas de visión estéreo tienen buena resolución de profundidad cuando los objetos se encuentran relativamente cerca.
+
+%Es por eso que no es conveniente que el robot se acerque mucho a un objeto porque la información de disparidad no es útil.
 
 \begin{figure}[h]
 	\centering
-		\includegraphics[width=0.50\textwidth]{C:/Users/aolmedo/Documents/informeRobotica/tpfinal/informe/figuras/fig3.png}
+		\includegraphics[width=0.50\textwidth]{./figuras/fig2.png}
+	\caption{Figura 1}
 	\label{fig:fig1}
 \end{figure}
 
+Cabe aclarar que para conseguir el mejor resultado posible eliminaremos la distorsion radial y tangencial de las imagenes obtenidas con la cámara Minoru. Además se ajusta los ángulos y distancias entre las cámaras para que los planos de las imagenes queden coplanares\footnote{Puntos o líneas que se encuentran en el mismo plano.}. A este último paso se lo conoce con el nombre de rectificacion. Estas operaciones las realizamos con la librería OpenCV.
+%La medida de la disparidad sirve para obtener la distancia a la que se sitúa físicamente ese objeto en la escena con respecto %a las dos cámaras
 
-\subsection{Calculo del mapa de disparidad}
+%Realizando los pasos anteriores sucesivamente obtenemos el mapa de disparidad. Dicha imagen nos permite utilizar la %información obtenida de las dos imágenes para saber la profundidad de cada objeto (o punto??). Veamos el concepto que se %utiliza para poder armar esta imagen.
 
-En esta seccion explicaremos los pasos ha realizar para obtener un mapa de disparidad  a partir de dos imágenes capturadas por la cámara estéreo.
+%Asumamos que la imagen no posee distorsión y esta rectificada. En la figura (12-6) podemos ver la representación de la visión %estéreo. Los puntos Ol y Or representan los centros de la cámara izquierda y derecha respectivamente. Los puntos pl y pr son %los proyectados en cada imagen respectivamente y corresponden a un unico punto P. Este punto debe ser alineado por las dos 5
+%imágenes. Si definimos como xl y xr como las coordenadas de x en cada punto respectivamente, podemos definir disparidad como d %= xl - xr.
 
-Básicamente, se buscan correspondencias entre los puntos que se encuentran en una imagen y los mismos puntos en la otra imagen. Con estas correspondencias y conocienfo la distancia entre las camaras(linea base) podemos calcular la ubicacion en 3 dimensiones de los puntos.
+%Cabe aclarar que para obtener buenos resultados se debe sacar las imágenes al mismo tiempo así como también rectificarlas.
 
-Para conseguir el mejor resultado posible eliminaremos la distorsion radial y tangencial de las imagenes obtenidas con la camara minoru. Ademas  se ajusta los angulos y distancias entre las camaras para que los planos de las imagenes queden coplanares. A este ultimo paso se lo conoce con el nombre de rectificacion. (mejorar)
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{./figuras/fig3.png}
+	\label{fig:fig1}
+\end{figure}
 
+\subsection{Reproyección de puntos en 2D}
+%que es la reproyección
+%
+Conociendo los parámetros intrínsecos y extrínsecos de las dos cámaras, podemos obtener la posición absoluta en tres dimensiones de los puntos proyectados.
 
+Como mencionamos anteriormente, para conseguir los mejores resultados posibles rectificamos las imágenes. Cuando openCV realiza la rectificación, a la vez calcula la matriz de reproyección Q.
 
+\[ Q = \left( \begin{array}{cccc}
+1 & 0 & 0 & -c_{x}\\
+0 & 1 & 0 & -c_{y}\\
+0 & 0 & 0 & f\\
+0 & 0 & -1/T_{x} & (c_{x}-c^{'}_{x})/T_{x}\end{array} \right)\]
 
+Donde $T_{x}$ es la longitud de la línea base, $c_{x}$ y $c_{y}$ son las coordenadas del punto principal en la primer cámara, f es la distancia focal y $c^{'}_{x}$ es la coordenada horizontal del punto principal de la segunda cámara.
 
-una vez que tenemos las dos imágenes utilizamos la información de las dos imágenes capturadas para encontrar las correspondencias entre ellas, como lo realiza nuestra vista.
+Luego podemos proyectar el punto en tres dimensiones realizando la  siguiente multiplicación:
 
-Los pasos son:
+\[ Q \left( \begin{array}{cccc}
+x \\
+y \\
+d \\
+1 \end{array} \right) = \left( \begin{array}{cccc}
+X \\
+Y \\
+Z \\
+W \end{array} \right) \]
 
-1 - Remover distorsiones radiales y tangenciales del lente; este proceso se llama (en ingles) undistortion
+%obtenemos las coordenadas en $P^{3}$ y 
+Las coordenadas 3D quedarían: \[ \left( \begin{array}{ccc} X/W, & Y/W, & Z/W\end{array} \right) \]
 
-2 - Ajustar los ángulos y distancias entre imágenes; este proceso se llama rectificación. En este paso ya obtenemos imágenes rectificadas y alineadas
+%\subsection{Calculo del mapa de disparidad}
 
-3 - Encontrar iguales puntos en las dos imágenes, esto se llama correspondencia. La salida de este proceso es una imagen llamada mapa de disparidad, donde la disparidad se refiere a la diferencia entre las dos imágenes en un mismo punto.
+%En esta seccion explicaremos los pasos ha realizar para obtener un mapa de disparidad  a partir de dos imágenes capturadas por %la cámara estéreo.
 
-4 - Por ultimo, podemos pasar el mapa de disparidad a distancias utilizando triangulación; este proceso se llama reproyección y la salida es una imagen con profundidad.
+%Los pasos son:
 
-Realizamos estos pasos utilizando fuertemente la librería Open CV. Esta librería nos facilita mucho la realización de cada uno de ellos. Vamos a dedicarnos fuertemente en explicar como utilizamos el mapa de disparidad.     
+%1 - Remover distorsiones radiales y tangenciales del lente; este proceso se llama (en ingles) undistortion
 
-\subsection{Mapas de disparidad}
+%2 - Ajustar los ángulos y distancias entre imágenes; este proceso se llama rectificación. En este paso ya obtenemos imágenes %rectificadas y alineadas
 
-(agregar imagenes 12-5 pag 417 libro open cv y 12-6 pag 418 del mismo libro, tambien puede ir la imagen 12-4)
+%3 - Encontrar iguales puntos en las dos imágenes, esto se llama correspondencia. La salida de este proceso es una imagen %llamada mapa de disparidad, donde la disparidad se refiere a la diferencia entre las dos imágenes en un mismo punto.
 
-Realizando los pasos anteriores sucesivamente obtenemos el mapa de disparidad. Dicha imagen nos permite utilizar la información obtenida de las dos imágenes para saber la profundidad de cada objeto (o punto??). Veamos el concepto que se utiliza para poder armar esta imagen.
+%4 - Por ultimo, podemos pasar el mapa de disparidad a distancias utilizando triangulación; este proceso se llama reproyección %y la salida es una imagen con profundidad.
 
-Asumamos que la imagen no posee distorsión y esta rectificada. En la figura (12-6) podemos ver la representación de la visión estéreo. Los puntos Ol y Or representan los centros de la cámara izquierda y derecha respectivamente. Los puntos pl y pr son los proyectados en cada imagen respectivamente y corresponden a un unico punto P. Este punto debe ser alineado por las dos imágenes. Si definimos como xl y xr como las coordenadas de x en cada punto respectivamente, podemos definir disparidad como d = xl - xr.
-
-Utilizando geometría podemos calcular la distancia Z, que es inversamente proporcional al valor de disparidad. Podemos apreciar esto en la figura (12-5). Si la distancia del objeto es mayor, el valor de disparidad va a ser mas chico. Por ejemplo, si vemos un objeto a mucha distancia, la visión de cada imagen va a ver ese objeto sin poda diferencia, es por eso que su disparidad tiende a cero. Ocurre lo contrario si el objeto esta mas cercano. La relación de estas dos variables claramente no es lineal.
-
-Cabe aclarar que para obtener buenos resultados se debe sacar las imágenes al mismo tiempo así como también rectificarlas.
-
-\subsection{Geometría epipolar}
-
-(agregamos figura 12-8 del mismo libro)
-
-Para entender un poco mas como encuentra la relación entre cada punto que representan el mismo objeto vamos a ver la geometría se sucede en las cámaras. La figura (12-8) nos muestra los planos que observa cada cámara y su relación con el punto en común P. Lo mas interesante es ver que para todo punto que se ve en las dos imágenes existe una linea epipolar que atraviesa por un punto epipolo y que tiene su correlación en la otra imagen. Esta es la base de la correspondencia entre cada imagen.
-
-Cada punto en 3D visto desde las cámaras esta contenido en un plano epipolar que intersecta cada imagen en la linea epipolar. Cuando un punto se corresponde con otro en la otra imagen debe apoyarse sobre su linea epipolar correspondiente. Gracias a esta regla, la búsqueda de cada punto con respecto a su correspondencia en la otra imagen se reduce de una búsqueda en dos dimensiones a una busqueda en una dimension , o sea sobre una linea. Esto reduce el computo significativamente.  
-
-(redactar mejor , la idea es esa)
-     
-
-introduccion: para que nos sirve el mapa de disparidad
-
-geometria epipolar:
- grafico geometria epipolar con su explicacióm
-
-como calculamos (como lo hace libelas) el mapa de disparidad (la teoria)
-
-mencionar libelas (referencia)
-
-teoria 417 open cv
-implementacion 438 ... 442
+%Realizamos estos pasos utilizando fuertemente la librería Open CV. Esta librería nos facilita mucho la realización de cada uno %de ellos. Vamos a dedicarnos fuertemente en explicar como utilizamos el mapa de disparidad.
 
 \section{Navegación para robot móviles utilizando los mapas de disparidad}
+%El flujo del algoritmo de navegación es el siguiente: 
+A continuación explicaremos brevemente los pasos realizados desde que se capturan las imágenes hasta que el robot realiza el movimiento calculado.
 
-Una vez que obtuvimos el mapa de disparidad debemos correr nuestro algoritmo de navegación. Dado un mapa de disparidad, vamos a explicar paso a paso que haría con ella.
+Como primer paso, en un mismo instante, capturamos con cada cámara la escena del mundo. Luego se calcula el mapa de disparidad, habiendo eliminado la distorsión radial y tangencial de las imágenes; así como habiendo realizado la rectificación de las mismas. Una vez que obtuvimos el mapa de disparidad se realiza una heuristica para encontrar un punto que este relativamente cerca del robot, porque sabemos que el mapa de disparidad nos brinda información útil cuando el objeto no esta muy cerca ni muy lejos. El punto encontrado se reproyecta obteniendo su posición absoluta en el mundo real. Por último calculamos el ángulo de giro y la distancia a recorrer para ir a este punto y le indicamos al robot que se movilice a dicho lugar.
 
-Sobre toda la imagen de disparidad nos quedamos con una región. Esta región esta determinada entre las filas 300 y 340 de la imagen. Este corte horizontal lo utilizamos para poder decidir para que lugar moverse. Realizamos varios experimentos y llegamos a la conclusión de que es la mejor region para definir el posible camino dada la arquitectura y las condiciones utilizadas. Esta región la llamaremos región de interes, con esta vamos a continuar con los pasos de navegacion.
+%%%%%%%
+\subsection{Procesamiento del mapa de disparidad}
 
-Cuando obtuvimos esta porción de imagen, vamos a procesarla para poder tomar una decisión con respecto a la navegación. Recorremos toda la imagen por columnas realizando la mediana de los datos por cada columna de información. (tenemos que hacer un grafico de esto.) Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. Realizamos distintos experimentos y llegamos a la conclusion que la mediana  representa bastante bien la distancia de cada columna. En un principio utilizamos el promedio de los valores pero fue descartado por lo siguiente: Supongamos que poseemos 1/3 de la columna con pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna de informacion. Si utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos elementos del medio vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que nos inclinamos a utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y pudimos evitarlo de esta forma.
+Sobre el mapa de disparidad tomaremos una región del mismo la cual llamaremos región de interes.
 
-Luego de realizado este procesamiento sobre cada columna de la imagen, obtenemos un array de todas las distancias sugeridas por cada columna.
+El mapa de disparidad nos aporta información sobre la profundidad a la que se encuentran los objetos del robot. Sin embargo, para agilizar el procesamiento, pero no va a ser necesario utilizarla en su totalidad para decidir que accion tomar. 
 
-Si no se obtiene una cadena de datos con información suficiente como para elegir un camino a seguir, el algoritmo define una política de escape.
+Sobre ella nos quedamos con una región. Esta región esta determinada entre las filas 300 y 340 de pixeles. La altura total de la imagen de disparidad es de 480 pixeles entonces esta region va a estar cruzando la mitad de ella.
 
-region de interes
-funcion de mediana
-justificacion
-puntos 3D
-arquitecteura de software y de hardware(figura 3 y 4 paper base)
+La razon por la cual obtenemos esta porcion de la imagen es que justo incluye la interseccion del suelo con el horizonte. Este corte horizontal lo utilizamos para poder decidir para que lugar moverse. Realizamos varios experimentos y llegamos a la conclusión de que es la mejor region para definir el posible camino dada la arquitectura y las condiciones utilizadas. 
+
+%, con esta vamos a continuar con los pasos de navegacion. %(meter grafico)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Cuando obtuvimos esta porción de imagen, vamos a procesarla para poder tomar una decisión con respecto a la navegación.
+
+Esta región la llamaremos "región de interes", sobre esta porción del mapa de disparidad aplicaremos la heuristica comentada anteriormente para encontrar punto al cual dirigirse.
+
+\subsubsection{Heuristica búsqueda punto}
+
+Primero vamos a recorrer la region realizando la mediana de los datos por cada columna de información. (tenemos que hacer un grafico de esto.) 
+
+Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. Realizamos distintos experimentos y llegamos a la conclusion que la mediana representa bastante bien la distancia de cada columna. En un principio utilizamos el promedio de los valores pero fue descartado por lo siguiente:  Supongamos que poseemos 1/3 de la columna con pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna de informacion. Si utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos elementos del medio vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que nos inclinamos a utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y pudimos evitarlo de esta forma.
+
+Al finalizar este primer procesamiento tenemos un vector con la mediana de cada una de las colunas.
+
+Puede suceder que el mapa de disparidad no nos provea informacion como para desicir que camino elegir. Esto sucede cuando el vector obtenido posee mas de la mitad de valores en negro. Si sucede, se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desicion. La politica de escape consiste en girar 30 grados hacia la derecha para poder tomar un mejor mapa de disparidad.
+
+Si tenemos informacion suficiente, vamos a ordenar el vector resultante del paso anterior y calculamos su mediana. Si este valor es mayor que 30 quiere decir que tenemos un objeto muy cerca. La cota que elegimos la obtuvimos de hacer varios experimentos y llegamos a la conclusion que es lo ideal para la arquitectura que utilizamos.  
+
+\subsection{Ángulo de giro y distancia a recorrer}
+
+Luego de hacer todos estos chequeos, vamos a definir que direccion tomar. Se va a calcular el punto 3D que representa esa mediana previamente calculada. Al obtener eso podemos saber a cuanta distancia estamos de ese punto. Por ultimo se calcula el angulo de giro y ya con estos dos datos podemos determinar que camino elegir.
+
+%Una vez que obtuvimos el mapa de disparidad debemos correr nuestro algoritmo de navegación. Dado un mapa de disparidad, vamos %a explicar paso a paso que haría con ella.
+
+%Sobre toda la imagen de disparidad nos quedamos con una región. Esta región esta determinada entre las filas 300 y 340 de la %imagen. Este corte horizontal lo utilizamos para poder decidir para que lugar moverse. Realizamos varios experimentos y %llegamos a la conclusión de que es la mejor region para definir el posible camino dada la arquitectura y las condiciones %utilizadas. Esta región la llamaremos región de interes, con esta vamos a continuar con los pasos de navegacion.
+
+%Cuando obtuvimos esta porción de imagen, vamos a procesarla para poder tomar una decisión con respecto a la navegación. %Recorremos toda la imagen por columnas realizando la mediana de los datos por cada columna de información. (tenemos que hacer %un grafico de esto.) Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. %Realizamos distintos experimentos y llegamos a la conclusion que la mediana  representa bastante bien la distancia de cada %columna. En un principio utilizamos el promedio de los valores pero fue descartado por lo siguiente: Supongamos que poseemos %1/3 de la columna con pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna %de informacion. Si utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos %elementos del medio vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que %nos inclinamos a utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y %pudimos evitarlo de esta forma.
+
+%Luego de realizado este procesamiento sobre cada columna de la imagen, obtenemos un array de todas las distancias sugeridas %por cada columna.
+
+%Si no se obtiene una cadena de datos con información suficiente como para elegir un camino a seguir, el algoritmo define una %política de escape.
+
+%region de interes
+%funcion de mediana
+%justificacion
+%puntos 3D
+%arquitecteura de software y de hardware(figura 3 y 4 paper base)
 
 \section{Experimentos}
-Experimentos.
+El entorno donde hicimos la mayoría de las pruebas es bastante particular. El piso no tuvo ninguna diferencia de nivel, la luminosidad era bastante importante y los objetos a esquivar fueron cajas grandes con aristas bien definidas. Estas condiciones son clave para poder obtener los resultados que antes expusimos.
 
-aquitectura del robot(paq udp, netbook)
+Los valores de cotas escritas en el codigo del programa fueron obtenidas en la sucesion de experimentos realizados en este entorno.
+\subsection{Arquitectura}
+%lugares donde se probo. Pruebas realizadas
+La arquitectura utilizada se puede dividir en dos partes: la computadora donde se corre el algoritmo descripto y la mecánica del robot. La computadora utilizada fue una Netbook Asus con sistema operativo Ubuntu Linux. La capacidad de procesamineto fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro algoritmo no posee altas restricciones de performance. La mecanica del robot se basa en un controlador que puede controlar las ruedas. Estas son dos de cada lado unidas por horugas. Para poder comunicarse con esta placa enviamos paquetes udp desde la Netbook. Para la parte de vision utilizamos la camara stereo Minoru que se encuentra conectada por usb al frente de la Netbook.  
 
-lugares donde se probo
+La conexion de nuestro programa con estas dos interfaces se realiza gracias a librerias. Utilizamos la libreria Libcam que nos permite sacar buenas fotos con esta camara stereo. Para la parte de comunicacion con las ruedas utilizamos la libreria libexabot-remote.  
 
-limitaciones encontradas (obstaculos grandes, luminosidad, objetos fijos, indoor, distancia de acercamiento)
+\subsection{Limitaciones}
+%limitaciones encontradas (obstaculos grandes, luminosidad, objetos fijos, indoor, distancia de acercamiento)
+La limitacion se basa fuertemente en el entorno que utilizamos. Si no cumplimos con el entorno que se utilizo en experimentos no se va a poder asegurar los resultados obtenidos.
 
-experimentos
+Otra limitacion importante es que los obstaculos no deben moverse, esto hace mas facil que nuestro algoritmo haga su trabajo. 
+
+Cabe destacar que el entorno utilizado juega un papel fundamental en el buen desempeño del algoritmo, utilizamos un entorno llano, iluminado para no perder ningún dato al tomar cada fotografía. La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y rotar sobre su propio eje.
 
 \section{Trabajos Futuros}
 
-chamuyo
-mapas vistos de arriba
-mejorar algunas cosas
-utilizar la información obtenidas de las imágenes anteriores para tomar mejores decisiones.(con objetos fijos)
-thread(futuro cercano y lejano a la vez)
+%mapas vistos de arriba
+%mejorar algunas cosas
+%utilizar la información obtenidas de las imágenes anteriores para tomar mejores decisiones.(con objetos fijos)
+%thread(futuro cercano y lejano a la vez)
 
+Nuestro trabajo nos provee un buen puntapie para seguir con un desarrollo mas sofisticado. Se podria mejorar en varios aspectos, por ejemplo poder ir armando un mapa visto desde el techo con cada movimiento realizado con el robot. Esto seria muy util porque nos mostraria el caminorealizado por el robot.
 
+Otra mejora podria ser tener un buffer de las imagenes anteriores y poder utilizarlas de alguna forma para tomar la nueva decision de la direccion a seguir.
 
-\section{Conclusion}
-The conclusion goes here.
+Otra mejora mas especifica podria ser utilizar un thread aparte para sacar las fotos. Este thread sacaria imagenes constantemente y las dejaria en una pila y cuando el algoritmo quera decidir un nuevo camino para continuar podria desapilar las imagenes que necesite y tomar la desicion.
+
+\section{Conclusión}
+El presente trabajo es una idea simple de como poder llevar a cabo un algoritmo de navegacion en una arquitectura definida. Resulto muy interesante ver como entre sucesivos experimentos pudimos mejorar el algoritmo. Tambien nos sirve para abordar muchos mas temas interesantes sobre vision robotica.
 
 \end{document}
