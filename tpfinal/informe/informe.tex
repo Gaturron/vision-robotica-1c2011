@@ -844,7 +844,11 @@ Las coordenadas 3D quedarían: \[ \left( \begin{array}{ccc} X/W, & Y/W, & Z/W\end
 %El flujo del algoritmo de navegación es el siguiente: 
 A continuación explicaremos brevemente los pasos realizados desde que se capturan las imágenes hasta que el robot realiza el movimiento calculado.
 
-Como primer paso, en un mismo instante, capturamos con cada cámara la escena del mundo. Luego se calcula el mapa de disparidad, habiendo eliminado la distorsión radial y tangencial de las imágenes; así como habiendo realizado la rectificación de las mismas. Una vez que obtuvimos el mapa de disparidad se realiza una heuristica para encontrar un punto que este relativamente cerca del robot, porque sabemos que el mapa de disparidad nos brinda información útil cuando el objeto no esta muy cerca ni muy lejos. El punto encontrado se reproyecta obteniendo su posición absoluta en el mundo real. Por último calculamos el ángulo de giro y la distancia a recorrer para ir a este punto y le indicamos al robot que se movilice a dicho lugar.
+Como primer paso, en un mismo instante, capturamos con cada cámara la escena del mundo. Luego se calcula el mapa de disparidad, habiendo eliminado la distorsión radial y tangencial de las imágenes; así como habiendo realizado la rectificación de las mismas. Una vez que obtuvimos el mapa de disparidad se realiza una heuristica para encontrar el valor medio de disparidad. Con este valor construimos el punto a reproyectar, obteniendo su posición absoluta en el mundo real. Por último calculamos el ángulo de giro y la distancia a recorrer para ir a esta posición y le indicamos al robot que se movilice a dicho lugar.
+
+%En consecuencia un punto que este relativamente cerca del robot, debido que el mapa de disparidad nos brinda información útil %bajo estas condiciones.
+
+A continuación explicaremos en detalle los pasos más importantes del algoritmo.
 
 %%%%%%%
 \subsection{Procesamiento del mapa de disparidad}
@@ -852,6 +856,7 @@ Como primer paso, en un mismo instante, capturamos con cada cámara la escena del
 Los valores de disparidad del algoritmo se asignan con el mapa de disparidad que referencia a las coordenadas de la cámara izquierda.
 
 La región de interes es el área dentro de la cual se buscan los obstaculos. Por lo tanto, el algoritmo esta diseñando para ver los obstaculos solo en esta área particular. El tamaño de la región de interes es de 640 x 40 pixels. Esta región esta determinada entre las filas 300 y 340 de pixels, siendo el tamaño de las imágenes de 640 x 480 pixels.
+
 
 %Sobre el mapa de disparidad tomaremos una región del mismo la cual llamaremos región de interes.
 
@@ -870,10 +875,14 @@ La región de interes es el área dentro de la cual se buscan los obstaculos. Por 
 
 %Esta región la llamaremos "región de interes", sobre esta porción del mapa de disparidad aplicaremos la heuristica comentada %anteriormente para encontrar punto al cual dirigirse.
 
-Para evitar los obstaculos vamos a buscar, en la la región de interes, el punto al cual el robot se moverá.
+%Para evitar los obstaculos vamos a buscar, en la región de interes, el punto al cual el robot se moverá.
 
-\subsubsection{Heuristica búsqueda punto}
-La heuristica presentada para encontrar un punto al cual el robot se moverá, se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras.
+El procedimiento para evitar obstaculos consiste en buscar un punto, en la región de interes, al cual dirigirse que este relativamente cerca del robot y en el que  ningún objeto.
+
+se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras.
+
+\subsubsection{Heurística de la disparidad media}
+La heuristica presentada para encontrar el valor de diparidad medio, 
 
 La heuristica consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
 
@@ -885,9 +894,7 @@ La heuristica consiste en recorrer la región de interes calculando la mediana de
 
 La heuristica no nos asegura que el punto encontrado sea el mejor al cual dirigirse; pero sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto de las cámaras.
 
-Como explicamos anteriormente, para reproyectar un punto necesitamos multiplicar Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
-
-Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heuristica (comenzando dede la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
+Puede ocurrir que el mapa de disparidad no nos provea información suficiente para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desición. La politica de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
 
 %De esta manera, nos quedamos con un valor de disparidad medio que no nos asegura que sea el mejor punto al cual dirigirse pero %sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto %de las cámaras.
 
@@ -896,15 +903,29 @@ Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos de
 
 %Al finalizar este primer procesamiento tenemos un vector con la mediana de cada una de las colunas.
 
-Puede ocurrir que el mapa de disparidad no nos provea información suficiente para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desición. La politica de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
-
 %Si tenemos informacion suficiente, vamos a ordenar el vector resultante del paso anterior y calculamos su mediana. Si este %valor es mayor que 30 quiere decir que tenemos un objeto muy cerca. La cota que elegimos la obtuvimos de hacer varios %experimentos y llegamos a la conclusion que es lo ideal para la arquitectura que utilizamos.  
 
 \subsection{Calculo del ángulo de giro y distancia a recorrer}
 
+Como explicamos anteriormente, para reproyectar un punto necesitamos multiplicar Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
+
+Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heuristica (comenzando dede la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
+
 Luego de encontrar un punto: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \] lo reproyectamos para obtener el punto P en el mundo real (3D), al cual dirigirse. 
 
-Usando propiedades geometricas calculamos el ángulo de giro y la distancia.
+Usando propiedades trigonometricas calculamos el ángulo de giro y la distancia.
+%el ángulo de giro se esta calculando con la siguiente formula:
+%angulo = asin(X/Z);
+%if(X > 0){
+%    angulo = asin(X/Z);
+%}
+%else{
+%    angulo = asin((-1 * X)/Z);
+%    angulo = -angulo;
+%}
+%la distancia se esta calculando con la norma dos del punto (distance = sqrt(X*X + Y*Y + Z*Z))
+
+%analizar si lo expresamos así o lo dejamos simple en la otra subsección.
 
 %Luego de hacer todos estos chequeos, vamos a definir que direccion tomar. Se va a calcular el punto 3D que representa esa %mediana previamente calculada. Al obtener eso podemos saber a cuanta distancia estamos de ese punto. Por ultimo se calcula el %angulo de giro y ya con estos dos datos podemos determinar que camino elegir.
 
@@ -925,12 +946,21 @@ Usando propiedades geometricas calculamos el ángulo de giro y la distancia.
 %arquitecteura de software y de hardware(figura 3 y 4 paper base)
 
 \section{Experimentos}
-El entorno donde hicimos la mayoría de las pruebas es bastante particular. El piso no tuvo ninguna diferencia de nivel, la luminosidad era bastante importante y los objetos a esquivar fueron cajas grandes con aristas bien definidas. Estas condiciones son clave para poder obtener los resultados que antes expusimos.
+%Se realizaron pruebas para averiguar la velocidad y velocidad de giro del robot. por ejemplo 2 cm por segundo, 10 grados por segundo.
 
-Los valores de cotas escritas en el codigo del programa fueron obtenidas en la sucesion de experimentos realizados en este entorno.
+El entorno en que probamos el algoritmo de navegación es en ambientes interiores.
+
+%El entorno donde hicimos la mayoría de las pruebas es bastante particular. 
+El piso no tiene ninguna diferencia de nivel, la luminosidad era bastante importante y los objetos a esquivar fueron cajas grandes con aristas bien definidas. 
+
+%Estas condiciones son clave para poder obtener los resultados que antes expusimos.
+
+Si el ambiente es luminoso se consiguen mejores resultados porque la calidad de las imágenes será mejor.
+
+%Los valores de cotas escritas en el codigo del programa fueron obtenidas en la sucesion de experimentos realizados en este %entorno.
 \subsection{Arquitectura}
 %lugares donde se probo. Pruebas realizadas
-La arquitectura utilizada se puede dividir en dos partes: la computadora donde se corre el algoritmo descripto y la mecánica del robot. La computadora utilizada fue una Netbook Asus con sistema operativo Ubuntu Linux. La capacidad de procesamineto fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro algoritmo no posee altas restricciones de performance. La mecanica del robot se basa en un controlador que puede controlar las ruedas. Estas son dos de cada lado unidas por horugas. Para poder comunicarse con esta placa enviamos paquetes udp desde la Netbook. Para la parte de vision utilizamos la camara stereo Minoru que se encuentra conectada por usb al frente de la Netbook.  
+La arquitectura utilizada se puede dividir en dos partes: la computadora donde se corre el algoritmo descripto y la mecánica del robot. La computadora utilizada fue una Netbook Asus con sistema operativo Ubuntu Linux. La capacidad de procesamiento fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro algoritmo no posee altas restricciones de performance. La mecanica del robot se basa en un controlador que puede controlar las ruedas. Estas son dos de cada lado unidas por horugas. Para poder comunicarse con esta placa enviamos paquetes udp desde la Netbook. Para la parte de vision utilizamos la camara stereo Minoru que se encuentra conectada por usb al frente de la Netbook.  
 
 La conexion de nuestro programa con estas dos interfaces se realiza gracias a librerias. Utilizamos la libreria Libcam que nos permite sacar buenas fotos con esta camara stereo. Para la parte de comunicacion con las ruedas utilizamos la libreria libexabot-remote.
 
