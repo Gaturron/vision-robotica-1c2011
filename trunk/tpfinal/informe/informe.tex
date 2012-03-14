@@ -849,36 +849,64 @@ Como primer paso, en un mismo instante, capturamos con cada cámara la escena del
 %%%%%%%
 \subsection{Procesamiento del mapa de disparidad}
 
-Sobre el mapa de disparidad tomaremos una región del mismo la cual llamaremos región de interes.
+Los valores de disparidad del algoritmo se asignan con el mapa de disparidad que referencia a las coordenadas de la cámara izquierda.
 
-El mapa de disparidad nos aporta información sobre la profundidad a la que se encuentran los objetos del robot. Sin embargo, para agilizar el procesamiento, pero no va a ser necesario utilizarla en su totalidad para decidir que accion tomar. 
+La región de interes es el área dentro de la cual se buscan los obstaculos. Por lo tanto, el algoritmo esta diseñando para ver los obstaculos solo en esta área particular. El tamaño de la región de interes es de 640 x 40 pixels. Esta región esta determinada entre las filas 300 y 340 de pixels, siendo el tamaño de las imágenes de 640 x 480 pixels.
 
-Sobre ella nos quedamos con una región. Esta región esta determinada entre las filas 300 y 340 de pixeles. La altura total de la imagen de disparidad es de 480 pixeles entonces esta region va a estar cruzando la mitad de ella.
+%Sobre el mapa de disparidad tomaremos una región del mismo la cual llamaremos región de interes.
 
-La razon por la cual obtenemos esta porcion de la imagen es que justo incluye la interseccion del suelo con el horizonte. Este corte horizontal lo utilizamos para poder decidir para que lugar moverse. Realizamos varios experimentos y llegamos a la conclusión de que es la mejor region para definir el posible camino dada la arquitectura y las condiciones utilizadas. 
+%El mapa de disparidad nos aporta información sobre la profundidad a la que se encuentran los objetos del robot. Sin embargo, %para agilizar el procesamiento, pero no va a ser necesario utilizarla en su totalidad para decidir que accion tomar.
+
+%Sobre ella nos quedamos con una región. 
+
+%La razon por la cual obtenemos esta porcion de la imagen es que justo incluye la interseccion del suelo con el horizonte. Este %corte horizontal lo utilizamos para poder decidir para que lugar moverse. 
+
+%Realizamos varios experimentos y llegamos a la %conclusión de que es la mejor region para definir el posible camino dada la %arquitectura y las condiciones utilizadas. 
 
 %, con esta vamos a continuar con los pasos de navegacion. %(meter grafico)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Cuando obtuvimos esta porción de imagen, vamos a procesarla para poder tomar una decisión con respecto a la navegación.
 
-Esta región la llamaremos "región de interes", sobre esta porción del mapa de disparidad aplicaremos la heuristica comentada anteriormente para encontrar punto al cual dirigirse.
+%Esta región la llamaremos "región de interes", sobre esta porción del mapa de disparidad aplicaremos la heuristica comentada %anteriormente para encontrar punto al cual dirigirse.
+
+Para evitar los obstaculos vamos a buscar, en la la región de interes, el punto al cual el robot se moverá.
 
 \subsubsection{Heuristica búsqueda punto}
+La heuristica presentada para encontrar un punto al cual el robot se moverá, se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras.
 
-Primero vamos a recorrer la region realizando la mediana de los datos por cada columna de información. (tenemos que hacer un grafico de esto.) 
+La heuristica consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
 
-Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. Realizamos distintos experimentos y llegamos a la conclusion que la mediana representa bastante bien la distancia de cada columna. En un principio utilizamos el promedio de los valores pero fue descartado por lo siguiente:  Supongamos que poseemos 1/3 de la columna con pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna de informacion. Si utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos elementos del medio vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que nos inclinamos a utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y pudimos evitarlo de esta forma.
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.50\textwidth]{./figuras/fig13.png}
+	\caption{Heuristica}
+\end{figure}
 
-Al finalizar este primer procesamiento tenemos un vector con la mediana de cada una de las colunas.
+La heuristica no nos asegura que el punto encontrado sea el mejor al cual dirigirse; pero sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto de las cámaras.
 
-Puede suceder que el mapa de disparidad no nos provea informacion como para desicir que camino elegir. Esto sucede cuando el vector obtenido posee mas de la mitad de valores en negro. Si sucede, se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desicion. La politica de escape consiste en girar 30 grados hacia la derecha para poder tomar un mejor mapa de disparidad.
+Como explicamos anteriormente, para reproyectar un punto necesitamos multiplicar Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
 
-Si tenemos informacion suficiente, vamos a ordenar el vector resultante del paso anterior y calculamos su mediana. Si este valor es mayor que 30 quiere decir que tenemos un objeto muy cerca. La cota que elegimos la obtuvimos de hacer varios experimentos y llegamos a la conclusion que es lo ideal para la arquitectura que utilizamos.  
+Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heuristica (comenzando dede la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
 
-\subsection{Ángulo de giro y distancia a recorrer}
+%De esta manera, nos quedamos con un valor de disparidad medio que no nos asegura que sea el mejor punto al cual dirigirse pero %sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto %de las cámaras.
 
-Luego de hacer todos estos chequeos, vamos a definir que direccion tomar. Se va a calcular el punto 3D que representa esa mediana previamente calculada. Al obtener eso podemos saber a cuanta distancia estamos de ese punto. Por ultimo se calcula el angulo de giro y ya con estos dos datos podemos determinar que camino elegir.
+%Primero vamos a recorrer la region realizando la mediana de los datos por cada columna de información. (tenemos que hacer un %grafico de esto.) 
+%Si la columna posee algún valor muy lejano se le asigna un valor muy grande parametrizado en el programa. Realizamos distintos %experimentos y llegamos a la conclusion que la mediana representa bastante bien la distancia de cada columna. En un principio %utilizamos el promedio de los valores pero fue descartado por lo siguiente:  Supongamos que poseemos 1/3 de la columna con %pixeles negros. El promedio de esta columna va a estar cerca del valor de negro, descartando esa columna de informacion. Si %utilizamos la mediana, los valores mayores van a estar concentrados en la parte final. Al utilizar los dos elementos del medio 5vamos a obtener un valor de disparidad real y no va a estar afectado a los pixeles negros. Es por eso que nos inclinamos a %utilizar la mediana. Muchas veces experimentamos esto por tener imagenes con poca luminosidad por ejemplo y pudimos evitarlo %de esta forma.
+
+%Al finalizar este primer procesamiento tenemos un vector con la mediana de cada una de las colunas.
+
+Puede ocurrir que el mapa de disparidad no nos provea información suficiente para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desición. La politica de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
+
+%Si tenemos informacion suficiente, vamos a ordenar el vector resultante del paso anterior y calculamos su mediana. Si este %valor es mayor que 30 quiere decir que tenemos un objeto muy cerca. La cota que elegimos la obtuvimos de hacer varios %experimentos y llegamos a la conclusion que es lo ideal para la arquitectura que utilizamos.  
+
+\subsection{Calculo del ángulo de giro y distancia a recorrer}
+
+Luego de encontrar un punto: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \] lo reproyectamos para obtener el punto P en el mundo real (3D), al cual dirigirse. 
+
+Usando propiedades geometricas calculamos el ángulo de giro y la distancia.
+
+%Luego de hacer todos estos chequeos, vamos a definir que direccion tomar. Se va a calcular el punto 3D que representa esa %mediana previamente calculada. Al obtener eso podemos saber a cuanta distancia estamos de ese punto. Por ultimo se calcula el %angulo de giro y ya con estos dos datos podemos determinar que camino elegir.
 
 %Una vez que obtuvimos el mapa de disparidad debemos correr nuestro algoritmo de navegación. Dado un mapa de disparidad, vamos %a explicar paso a paso que haría con ella.
 
@@ -904,7 +932,7 @@ Los valores de cotas escritas en el codigo del programa fueron obtenidas en la s
 %lugares donde se probo. Pruebas realizadas
 La arquitectura utilizada se puede dividir en dos partes: la computadora donde se corre el algoritmo descripto y la mecánica del robot. La computadora utilizada fue una Netbook Asus con sistema operativo Ubuntu Linux. La capacidad de procesamineto fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro algoritmo no posee altas restricciones de performance. La mecanica del robot se basa en un controlador que puede controlar las ruedas. Estas son dos de cada lado unidas por horugas. Para poder comunicarse con esta placa enviamos paquetes udp desde la Netbook. Para la parte de vision utilizamos la camara stereo Minoru que se encuentra conectada por usb al frente de la Netbook.  
 
-La conexion de nuestro programa con estas dos interfaces se realiza gracias a librerias. Utilizamos la libreria Libcam que nos permite sacar buenas fotos con esta camara stereo. Para la parte de comunicacion con las ruedas utilizamos la libreria libexabot-remote.  
+La conexion de nuestro programa con estas dos interfaces se realiza gracias a librerias. Utilizamos la libreria Libcam que nos permite sacar buenas fotos con esta camara stereo. Para la parte de comunicacion con las ruedas utilizamos la libreria libexabot-remote.
 
 \subsection{Limitaciones}
 %limitaciones encontradas (obstaculos grandes, luminosidad, objetos fijos, indoor, distancia de acercamiento)
