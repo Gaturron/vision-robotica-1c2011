@@ -877,14 +877,11 @@ La región de interes es el área dentro de la cual se buscan los obstaculos. Por 
 
 %Para evitar los obstaculos vamos a buscar, en la región de interes, el punto al cual el robot se moverá.
 
-El procedimiento para evitar obstaculos consiste en buscar un punto, en la región de interes, al cual dirigirse que este relativamente cerca del robot y en el que  ningún objeto.
+El procedimiento de navegación consiste en buscar un punto en la región de interes, al cual dirigirse, que este relativamente cerca del robot y en el que no se encuentre ningún obstaculo. El mismo se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras. Para lograr esto buscaremos el valor de disparidad medio.
 
-se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras.
-
-\subsubsection{Heurística de la disparidad media}
-La heuristica presentada para encontrar el valor de diparidad medio, 
-
-La heuristica consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
+\subsubsection{Heurística del valor de disparidad medio}
+%La heuristica presentada para encontrar el valor de diparidad medio, 
+La heurística consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
 
 \begin{figure}[h]
 	\centering
@@ -892,9 +889,13 @@ La heuristica consiste en recorrer la región de interes calculando la mediana de
 	\caption{Heuristica}
 \end{figure}
 
-La heuristica no nos asegura que el punto encontrado sea el mejor al cual dirigirse; pero sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto de las cámaras.
+Esta heurística no nos asegura que el punto encontrado sea el mejor al cual dirigirse; pero sabemos que con dicho valor de disparidad nos brinda información fehaciente de la distancia en la que se encuentra el punto de las cámaras.
 
-Puede ocurrir que el mapa de disparidad no nos provea información suficiente para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una politica de escape ya que la informacion provista no es suficiente para determinar una desición. La politica de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
+Puede ocurrir que el mapa de disparidad no nos provea suficiente información para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una política de escape ya que la información provista no es suficiente para determinar una desición. La política de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
+
+Otra ocasión en la que se aplica la política de escape es cuando el punto calculado por la heurística se encuentra muy cerca del robot. Si bien no es sumamente necesario es una mejora para encontrar mejores caminos. 
+
+%Ya que si nos acercamos mucho a un objeto se aplicará la politica de escape por falta de información en el mapa de disparidad. Y si el objeto que esta cerca es muy grande se tendra que aplicar varias veces la politica de escape probablemente volviendo a pasra por el camino ya recorrido.
 
 %De esta manera, nos quedamos con un valor de disparidad medio que no nos asegura que sea el mejor punto al cual dirigirse pero %sabemos que con dicho valor de disparidad, al proyectarlo, nos indicará la distancia correcta en la que se encuentra el punto %de las cámaras.
 
@@ -907,13 +908,15 @@ Puede ocurrir que el mapa de disparidad no nos provea información suficiente par
 
 \subsection{Calculo del ángulo de giro y distancia a recorrer}
 
-Como explicamos anteriormente, para reproyectar un punto necesitamos multiplicar Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
+Como explicamos anteriormente, para reproyectar un punto debemos multiplicar la matriz de reproyección Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
 
 Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heuristica (comenzando dede la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
 
-Luego de encontrar un punto: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \] lo reproyectamos para obtener el punto P en el mundo real (3D), al cual dirigirse. 
+Luego reproyectamos este punto para obtener el punto P, en el mundo real, al cual dirigirse.
 
-Usando propiedades trigonometricas calculamos el ángulo de giro y la distancia.
+%Luego de encontrar un punto: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \] lo reproyectamos para %obtener el punto P en el mundo real (3D), al cual dirigirse. 
+
+Por último utilizando propiedades trigonométricas calculamos el ángulo de giro y la distancia. Cabe aclara que al robot no se le indica la distancia calculada, sino que se le indica una distancia menor para que no quede muy cerca del objeto y tenga que aplicar la política de escape.
 %el ángulo de giro se esta calculando con la siguiente formula:
 %angulo = asin(X/Z);
 %if(X > 0){
