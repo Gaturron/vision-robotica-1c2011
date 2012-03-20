@@ -451,9 +451,8 @@
 % journal papers have the author affiliations above the "Manuscript
 % received ..."  text while in non-compsoc journals this is reversed. Sigh.
 
-\author{Agustín Olmedo,\IEEEmembership{Estudiante, UBA}\linebreak 
-        Amit Stein,\IEEEmembership{Estudiante, UBA,}\linebreak
-        y Fernando Bugni, \IEEEmembership{Estudiante, UBA,}% <-this % stops a space
+\author{Agustín Olmedo,\IEEEmembership{Estudiante, UBA,}\linebreak
+        Fernando Bugni, \IEEEmembership{Estudiante, UBA.}% <-this % stops a space
         }
 %\IEEEcompsocitemizethanks{}% <-this % stops a space
 %\thanks{}%\IEEEcompsocthanksitem M. Shell is with the Department
@@ -536,7 +535,7 @@ El presente trabajo desarrolla una implemetación para la navegación de un robot 
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Computer Society, \LaTeX, Visión Computacional, OpenCV, Mapas de Disparidad
+Visión Computacional, OpenCV, Mapas de Disparidad, calibración estéreo, geometría epipolar, reproyección, región de interes, visión robótica, navegación.
 \end{IEEEkeywords}}
 
 
@@ -568,7 +567,9 @@ Computer Society, \LaTeX, Visión Computacional, OpenCV, Mapas de Disparidad
 
 \section{Introducción}
 
-\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. Esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, asistencia para personas con discapacidades e inclusive como guias en una exposición.
+\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. Esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares y asistencia para personas con discapacidades.
+
+%e inclusive como guias en una exposición.
 
 En particular en el presente trabajo desarrollaremos un algoritmo de navegación de robots utilizando visión estéreo. En la actualidad, existen diversas técnicas de visión por computadora que nos brindan la información necesaria sobre el entorno. Entre ellas se encuentra la visión estéreo que utiliza dos cámaras para obtener datos de los puntos en tres dimensiones. Algunas aplicaciones de estas técnicas son: construcción de mapas de un entorno desconocido, localización, reconstrucción 3D o también reconocimiento de objetos.
 
@@ -762,10 +763,9 @@ Luego, conociendo el valor de disparidad y la distancia entre los centros óptico
 	\centering
 		\includegraphics[width=0.50\textwidth]{./figuras/fig1.png}
 	\caption{figura 1:}
-	\label{fig:fig1}
 \end{figure}
 
-De la fórmula anterior podemos observar que la distancia de un punto a las cámaras es inversamente proporcional al valor de disparidad (ver figura 3.3). Si el valor de disparidad es cercano a cero, pequeñas diferencias en la disparidad producen grandes diferencias en la profundidad. Y si la disparidad es grande pequeñas diferencias en la disparidad no producen diferencias en la profundidad. La relación de estas dos variables es claramente no lineal.
+De la fórmula anterior podemos observar que la distancia de un punto a las cámaras es inversamente proporcional al valor de disparidad (ver figura 3.3). Si el valor de disparidad es cercano a cero, pequeñas diferencias en la disparidad producen grandes diferencias en la profundidad, y si la disparidad es grande pequeñas diferencias en la disparidad no producen diferencias en la profundidad.
 
 Con lo cual, si el valor de disparidad es muy pequeño o muy grande la disparidad no nos dice mucho sobre la profundidad a la que se encuentra el objeto de las cámaras. En consecuencia los sistemas de visión estéreo tienen buena resolución de profundidad cuando los objetos se encuentran relativamente cerca.
 
@@ -774,8 +774,7 @@ Con lo cual, si el valor de disparidad es muy pequeño o muy grande la disparidad
 \begin{figure}[h]
 	\centering
 		\includegraphics[width=0.50\textwidth]{./figuras/fig2.png}
-	\caption{Figura 1}
-	\label{fig:fig1}
+	\caption{Relación entre disparidad y distancia}
 \end{figure}
 
 Cabe aclarar que para conseguir el mejor resultado posible eliminaremos la distorsion radial y tangencial de las imagenes obtenidas con la cámara Minoru. Además se ajusta los ángulos y distancias entre las cámaras para que los planos de las imagenes queden coplanares\footnote{Puntos o líneas que se encuentran en el mismo plano.}. A este último paso se lo conoce con el nombre de rectificacion. Estas operaciones las realizamos con la librería OpenCV.
@@ -791,7 +790,7 @@ Cabe aclarar que para conseguir el mejor resultado posible eliminaremos la disto
 \begin{figure}[h]
 	\centering
 		\includegraphics[width=0.50\textwidth]{./figuras/fig3.png}
-	\label{fig:fig1}
+	\caption{Imágenes rectificadas}
 \end{figure}
 
 \subsection{Reproyección de puntos en 2D}
@@ -881,7 +880,7 @@ El procedimiento de navegación consiste en buscar un punto en la región de inter
 
 \subsubsection{Heurística del valor de disparidad medio}
 %La heuristica presentada para encontrar el valor de diparidad medio, 
-La heurística consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
+La heurística consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI\footnote{Region Of Interest} a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
 
 \begin{figure}[h]
 	\centering
@@ -954,7 +953,7 @@ Por último utilizando propiedades trigonométricas calculamos el ángulo de giro y
 El algoritmo de navegación ha sido probado en ambientes interiores. A continuación mencionaremos algunas características que debe cumplir el ambiente para el correcto funcionamiento del mismo:
 
 \begin{itemize}
-	\item El piso no poseea ninguna diferencia de nivel.
+	\item El piso no debe tener ninguna diferencia de nivel.
 	\item Ambientes luminosos. Si el ambiente es luminoso se consiguen mejores resultados porque la calidad de las imágenes será mejor.
 	\item Obstaculos grandes.
 	\item Obstaculos separados por una distancia considerable.
@@ -976,12 +975,27 @@ El algoritmo de navegación ha sido probado en ambientes interiores. A continuaci
 \subsection{Arquitectura de hardware}
 %lugares donde se probo. Pruebas realizadas
 
-La arquitectura utilizada se puede dividir en dos partes: la computadora donde se ejecuta el algoritmo descripto y la mecánica del robot. La computadora utilizada fue una Netbook Asus con sistema operativo Ubuntu Linux. La capacidad de procesamiento fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro algoritmo no posee altas restricciones de performance. La mecanica del robot se basa en un controlador que puede controlar los motores de las ruedas. Estas son dos de cada lado unidas por horugas. Para poder comunicarse con el robot envíamos paquetes udp desde la Netbook. Para la parte de visión utilizamos la cámara estéreo Minoru que se encuentra conectada por usb al frente de la Netbook.  
+La arquitectura utilizada se puede dividir en tres partes: 
+
+\begin{itemize}
+	\item Una computadora donde se ejecuta el algoritmo descripto. La misma es una Netbook Asus con sistema operativo Ubuntu Linux, que se encuentra apoyada en un soporte que posee el robot. 
+%La capacidad de procesamiento fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro %algoritmo no posee altas restricciones de performance. 
+	\item El robot, que posee una microcomputadora que corre un linux 2.6 portable. El mismo está conectado a la netbook por un cable de red (RJ-45).%El cual realiza el movimiento especificado.
+	\item La cámara estéreo que se encuentra en la parte superior del frente del robot. La misma esta conectada por USB a la netbook.
+\end{itemize}
+
+%Para realizar la comunicación entre 
+La netbook y el robot se comunican mediante paquetes UDP. Para esto utilizamos la librería libexabot-remote provista por la cátedra. La misma nos provee las interfaces necesarias para realizar los movimientos del robot, como por ejemplo, avanzar, retroceder y rotar. 
+
+En el robot se encuentra un pequeño servidor esperando los paquetes UDP y nuestro programa le envía las decisiones tomadas a este servidor que las procesa y ejecuta el movimiento.
+
+Por otro lado, utilizamos la libreria Libcam que nos permite capturar imágenes de alta calidad aprovechando al máximo la cámara estéreo.
+
+% y .  La mecanica del robot se basa en un controlador que puede controlar los motores de las ruedas. Estas son dos de cada %lado unidas por horugas. Para poder comunicarse con el robot envíamos paquetes udp desde la Netbook. Para la parte de visión %utilizamos la cámara estéreo Minoru que se encuentra conectada por usb al frente de la Netbook.
 
 %La conexion de nuestro programa con estas dos interfaces se realiza gracias a librerias. 
-Para realizar la comunicación con el robot utilizamos la librería libexabot-remote provista por la cátedra. Además utilizamos la libreria Libcam que nos permite capturar imágenes de alta calidad aprovechando al máximo la cámara estéreo.
 
-La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y rotar sobre su propio eje.
+%La cámara se encuentra en la parte superior del frente del robot y su movilidad se reduce a avanzar, retroceder y rotar sobre %su propio eje.
 
 %\subsection{Limitaciones}
 %limitaciones encontradas (obstaculos grandes, luminosidad, objetos fijos, indoor, distancia de acercamiento)
@@ -995,14 +1009,32 @@ La cámara se encuentra en la parte superior del frente del robot y su movilidad 
 %mejorar algunas cosas
 %utilizar la información obtenidas de las imágenes anteriores para tomar mejores decisiones.(con objetos fijos)
 %thread(futuro cercano y lejano a la vez)
+A continuación mencionaremos algunas mejoras que podrían incluirse en un trabajo futuro:
 
-Nuestro trabajo nos provee un buen puntapie para seguir con un desarrollo mas sofisticado. Se podria mejorar en varios aspectos, por ejemplo poder ir armando un mapa visto desde el techo con cada movimiento realizado con el robot. Esto seria muy util porque nos mostraria el camino realizado por el robot.
+\begin{itemize}
+	\item Tomar la decisión con más de una imagen. Tener un buffer de las imágenes anteriores y utilizarlas, de alguna forma,  para tomar la nueva decisión de la dirección a seguir.
+	\item Utilizar un thread aparte para capturar las imágenes. Este thread sacaría imágenes constantemente y las dejaría en una pila y cuando el algoritmo quiera decidir un nuevo camino para continuar podría desapilar las imágenes que necesite y tomar la desición. De esta manera podría evitarse que el robot frene entre cada pasada del algoritmo.
+\end{itemize}
 
-Otra mejora podria ser tener un buffer de las imagenes anteriores y poder utilizarlas de alguna forma para tomar la nueva decision de la direccion a seguir.
+Además como continuación del trabajo se podría armar un mapa del lugar, visto desde arriba(2D); así como localizar el robot en dicho mapa.  %con el robot. Esto seria muy util porque nos mostraria el camino realizado por el robot.
+%Nuestro trabajo nos provee un buen puntapie para seguir con un desarrollo mas sofisticado. 
 
-Otra mejora mas especifica podria ser utilizar un thread aparte para sacar las fotos. Este thread sacaria imagenes constantemente y las dejaria en una pila y cuando el algoritmo quera decidir un nuevo camino para continuar podria desapilar las imagenes que necesite y tomar la desicion.
+%Se podria mejorar en varios aspectos, por ejemplo poder ir armando un mapa visto desde el techo con cada movimiento realizado %con el robot. Esto seria muy util porque nos mostraria el camino realizado por el robot.
+
+%Otra mejora podria ser tener un buffer de las imagenes anteriores y poder utilizarlas de alguna forma para tomar la nueva %decision de la direccion a seguir.
+
+%Otra mejora mas especifica podria ser utilizar un thread aparte para sacar las fotos. Este thread sacaria imagenes %constantemente y las dejaria en una pila y cuando el algoritmo quera decidir un nuevo camino para continuar podria desapilar %las imagenes que necesite y tomar la desicion.
 
 \section{Conclusión}
-El presente trabajo es una idea simple de como poder llevar a cabo un algoritmo de navegacion en una arquitectura definida. Resulto muy interesante ver como entre sucesivos experimentos pudimos mejorar el algoritmo. Tambien nos sirve para abordar muchos mas temas interesantes sobre vision robotica.
+
+El mapa de disparidad es un método efieciente para almacenar la profundidad o distancia de cada pixel. Con esta información utilizamos...
+
+%El presente trabajo es una idea simple de como poder llevar a cabo un algoritmo de navegacion en una arquitectura definida. %Resulto muy interesante ver como entre sucesivos experimentos pudimos mejorar el algoritmo. Tambien nos sirve para abordar %muchos mas temas interesantes sobre vision robotica.
+
+\section{Referencias}
+
+$[1]$ Region of interest in disparity mapping for navigation of stereo vision autonomous guided vehicle.\\
+$[2]$ Learning openCV: computer vision with the openCV library.\\
+$[3]$ Multiple view geometry in computer vision.
 
 \end{document}
