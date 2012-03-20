@@ -451,7 +451,7 @@
 % journal papers have the author affiliations above the "Manuscript
 % received ..."  text while in non-compsoc journals this is reversed. Sigh.
 
-\author{Agustín Olmedo, \IEEEmembership{Estudiante, UBA,}\linebreak
+\author{Agustín Olmedo,\IEEEmembership{Estudiante, UBA,}\linebreak
         Fernando Bugni, \IEEEmembership{Estudiante, UBA.}% <-this % stops a space
         }
 %\IEEEcompsocitemizethanks{}% <-this % stops a space
@@ -523,7 +523,7 @@
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 %\boldmath
-El presente trabajo desarrolla una implementación para la navegación de un robot utilizando visión estéreo. Al mismo utiliza conceptos sobre visión computacional: calibración estéreo, mapa de disparidad, rectificación. La implementación fue desarrollada íntegramente en C++ utilizando la librería OpenCV, además de otras librerías para la movilidad del robot.
+El presente trabajo desarrolla una implemetación para la navegación de un robot utilizando visión estéreo. Al mísmo utiliza conceptos sobre vision computacional: calibración estéreo, mapa de disparidad, rectificación. La implementación fue desarrollada integramente en C++ utilizando la libreria OpenCV, además de otras librerias para la movilidad del robot.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -535,7 +535,7 @@ El presente trabajo desarrolla una implementación para la navegación de un robot
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Visión Computacional, OpenCV, Mapas de Disparidad, calibración estéreo, geometría epipolar, reproyección, región de interés, visión robótica, navegación.
+Visión Computacional, OpenCV, Mapas de Disparidad, calibración estéreo, geometría epipolar, reproyección, región de interes, visión robótica, navegación.
 \end{IEEEkeywords}}
 
 
@@ -579,7 +579,7 @@ El enfoque de este trabajo consiste, principalmente, en utilizar visión estéreo 
 
 Un paper que ha influido fuertemente el presente trabajo fue "Region of Interest in Disparity Mapping for Navigation of Stereo Vision Autonomous Guided Vehicle". El mismo posee un enfoque similar en cuanto a las técnicas de visión utilizadas. Las diferencias radican en la interpretación de la información que nos brindan los mapas de disparidad.
 
-La organización del paper sigue el orden cronológico en que fuimos aplicando los distintos pasos, empezando con la calibración y calibración estéreo, luego explicamos los conceptos necesarios para entender de que forma utilizamos la visión estéreo para obtener la información necesaria para realizar el algoritmo de navegación propuesto; continuando con la explicación del algoritmo de navegación. Por último, se incluye una sección de experimentos donde se explica brevemente los experimentos realizado, la arquitectura del robot que se ha usado en los experimentos y las limitaciones del algoritmo.
+La organización del paper sigue el orden cronológico en que fuimos aplicando los distintos pasos, empezando con la calibración y calibracón estéreo, luego explicamos los conceptos necesarios para entender de que forma utilizamos la visión estéreo para obtener la información necesaria para realizar el algoritmo de navegación propuesto; continuando con la explicación del algoritmo de navegación. Por último, se incluye una sección de experimentos donde se explica brevemente los experimentos realizado, la arquitectura del robot que se ha usado en los experimentos y las limitaciones del algoritmo.
 
 %\IEEEPARstart{L}{a} navegación de robots es el área encargada de desarrollar robots capaces de desplazarse de forma autónoma. %La utilización de esta tecnología se utiliza en distintos ámbitos como por ejemplo:  misiones espaciales, misiones militares, %asistencia para personas con discapacidades e inclusive como guias en una exposición.
 
@@ -608,9 +608,9 @@ Existen tres sistemas de referencias posibles:
 	%origen en la esquina de la imagen. Unidades en pixel
 \end{itemize}
 
-La unidad del sistema de referencia de la imagen es el píxel, mientras que en los demás es el metro. El sistema de la cámara tiene el origen en el centro óptico y el de la imagen en la esquina de la misma.
+La unidad del sistema de referencia de la imagen es el pixel, mientras que en los demás es el metro. El sistema de la cámara tiene el origen en el centro óptico y el de la imagen en la esquina de la misma.
 
-Los parámetros intrínsecos son los que relacionan el sistema de referencia de la cámara con el de la imagen y los extrínsecos son los que relacionan el sistema de referencia del mundo con el de la cámara (Ver figura 1).
+Los parámetros intrínsecos son los que relacionan el sistema de referencia de la cámara con el de la imagen y los extrínsecos son los que relacionan el sistema de referencia del mundo con el de la cámara.
 
 \begin{figure}[h]
 	\centering
@@ -634,8 +634,8 @@ La conversión del sistema de referencia del mundo al de la cámara implica una tr
 %		\caption{Parámetros extrínsecos}
 %\end{figure}
 %el sistema de referencia de la cámara y el sistema de referencia de la imagen no tienen las mismas unidades.
-Un punto en el mundo, visto desde la cámara, se proyecta en el plano de la imagen. Geométricamente podemos calcular la relación entre el punto en el mundo y el punto proyectado en el plano de la imagen (Ver figura 2).
-Además se traslada el origen del plano de la imagen llevándolo al centro, y se realiza un cambio de unidad dividiendo por el número de píxeles por unidad de distancia.
+Un punto en el mundo, visto desde la cámara, se proyecta en el plano de la imagen. Geometricamente podemos calcular la relación entre el punto en el mundo y el punto proyectado en el plano de la imagen(Ver figura 2).
+Además se traslada el origen del plano de la imagen llevandolo al centro, y se realiza un cambio de unidad dividiendo por el número de pixels por unidad de distancia.
 
 \begin{figure}[h]
 	\centering
@@ -643,7 +643,7 @@ Además se traslada el origen del plano de la imagen llevándolo al centro, y se r
 	\caption{\footnotesize\textit{Parámetros intrínsecos: El punto en el mundo $(X, Y, Z)^{T}$ visto desde la cámara se proyecta en el plano de la imagen como $(fX/Z, fY/Z)^{T}$}}
 \end{figure}
 
-Con lo cual los parámetros intrínsecos son: la distancia focal, el punto principal y se agregan el skew (pixel oblicuo), y la distorsión de los lentes, etc.
+Con lo cual los parámetros intrínsecos son: la distancia focal, el punto principal y se agregan el skew (pixel oblicuo), y la distorción de los lentes, etc.
 
 %La cámara y el mundo tienen medidas fisicas como por ejemplo: metros.
 %La imagen tiene medidas en pixeles.
@@ -657,11 +657,11 @@ cámara esta calibrada, pudiendo relacionar cualquier punto del mundo real con lo
 
 %{explicacion de cada figura y decir que si no calibramos cada punto proyectado no se reflejaria bien en la camara, decir que %usamos una camara pinhole}
 
-Para el desarrollo del presente trabajo utilizamos una cámara estéreo, con lo cual no nos alcanza solo con calibrar cada una de las cámaras, sino que además debemos calibrar las dos cámaras de forma conjunta. A esto se lo denomina calibración estéreo.
+Para el desarrollo del presente trabajo utilizamos una camara estéreo, con lo cual no nos alcanza solo con calibrar cada una de las cámaras, sino que además debemos calibrar las dos cámaras de forma conjunta. A esto se lo denomina calibración estéreo.
 
 La calibración estéreo nos provee los parámetros intrínsecos de cada cámara (que son los obtenidos en la calibración de cada una) y los parámetros extrínsecos, que nos definen la posición relativa de las cámaras.
 
-Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras para Matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib\_doc/}. Esta herramienta utiliza un patrón plano. El mismo debe contener cuadrados blancos y negros intercalados de un cierto tamaño conocido. El proceso del toolbox consiste en capturar imágenes de este patrón desde distintos ángulos y luego marcar las cuatro esquinas del patrón en cada una de ellas.
+Para realizar dicha calibración utilizamos un toolbox de calibración de cámaras para matlab \footnote{http://www.vision.caltech.edu/bouguetj/calib\_doc/}. Esta herramienta utiliza un patrón plano. El mismo debe contener cuadrados blancos y negros intercalados de un cierto tamaño conocido. El proceso del toolbox consiste en capturar imágenes de este patrón desde distintos angulos y luego marcar las cuatro esquinas del patrón en cada una de ellas.
 
 %necesita una serie de fotos para realizar la calibración.
 
@@ -686,7 +686,7 @@ A continuación explicaremos la configuración geométrica que se aplica en el camp
 %(agregamos figura 12-8 del mismo libro)
 
 %Para entender un poco mas como encuentra la relación entre cada punto que representan el mismo objeto vamos a ver la geometría %se sucede en las cámaras. 
-La geometría epipolar posee dos sistemas de referencias, uno por cada cámara, y surgen dos puntos importantes llamados epipolos. Un epipolo es la imagen del centro óptico de una de las cámaras con respecto a la otra (Ver figura 3).
+La geometría epipolar posee dos sistemas de referencias, uno por cada cámara, y surgen dos puntos importantes llamados epipolos. Un epipolo es la imagen del centro óptico de una de las cámaras con respecto a la otra (ver figura 5).
 
 \begin{figure}[h]
 	\centering
@@ -701,7 +701,7 @@ Los puntos $O_{l}$, $O_{r}$ y $P$ definen un plano llamado plano epipolar. Las p
 
 Las líneas epipolares son las intersecciones del plano epipolar con los planos de las imagen de cada cámara. Para cualquier plano epipolar, las líneas epipolares incluyen los epipolos.
 
-La imagen de las ubicaciones posible de un punto visto en una de las imágenes es la línea que va desde el correspondiente punto y el punto epipolar en la otra imagen. Es decir, viendo la figura 4 algún punto $P$ en el mundo va a estar proyectado en la imagen, de la cámara derecha, en la línea epipolar $l^{'}$. Podemos ver como en la imagen izquierda todos los puntos se ven juntos, mientras que en la imagen de la derecha se ven alineados sobre la línea epipolar $l^{'}$. Esta es la utilidad de los epipolos.
+La imagen de las ubicaciones posible de un punto visto en una de las imágenes es la línea que va desde el correspondiente punto y el punto epipolar en la otra imagen. Es decir, viendo la figura 6 algun punto $P$ en el mundo va a estar proyectado en la imagen, de la cámara derecha, en la línea epipolar $l^{'}$. Podemos ver como en la imagen izquierda todos los puntos se ven juntos, mientras que en la imagen de la derecha se ven alineados sobre la línea epipolar $l^{'}$. Esta es la utilidad de los epipolos.
 
 \begin{figure}[h]
 	\centering
@@ -749,11 +749,11 @@ El algoritmo de navegación realizado en el presente trabajo utiliza información 
 
 Una forma de obtener la distancia a la que se sitúa físicamente un objeto en el mundo con respecto a las dos cámaras, consiste en identificar en ambas imágenes aquellos píxeles que se corresponden con la misma entidad física en la escena 3D para luego hallar la distancia que separa estos píxeles. Esto es lo que se conoce como disparidad.
 
-Para calcular la disparidad hemos usado la librería Libelas\footnote{http://www.rainsoft.de/software/libelas.html}(Library for Efficient Large-scale Stereo Matching). Básicamente, lo que hace esta librería es buscar los descriptores característicos de cada imagen con una implementación del algoritmo SURF\footnote{ftp://ftp.vision.ee.ethz.ch/publications/articles/eth\_biwi\_00517.pdf}(Speeded Up Robust Features) para luego buscar las correspondencias entre los puntos encontrados en el paso anterior. Con lo cual, la disparidad es d = $x_{l}$ - $x_{r}$ donde $x_{l}$ y $x_{r}$ son las correspondencias entre los puntos de cada imagen. 
+Para calcular la disparidad hemos usado la libreira Libelas\footnote{http://www.rainsoft.de/software/libelas.html}(Library for Efficient Large-scale Stereo Matching). Básicamente, lo que hace esta librería es buscar los descriptores característicos de cada imagen con una implementación del algoritmo SURF\footnote{ftp://ftp.vision.ee.ethz.ch/publications/articles/eth\_biwi\_00517.pdf}(Speeded Up Robust Features) para luego buscar las correspondencias entre los puntos encontrados en el paso anterior. Con lo cual, la disparidad es d = $x_{l}$ - $x_{r}$ donde $x_{l}$ y $x_{r}$ son las correspondencias entre los puntos de cada imagen. 
 
 %una vez que calculamos la disparidad utilizando geometría podemos calcular la distancia Z,
 
-Luego, conociendo el valor de disparidad y la distancia entre los centros ópticos de las cámaras(línea base) podemos calcular la profundidad de los puntos usando triángulos semejantes (Ver figura 5).
+Luego, conociendo el valor de disparidad y la distancia entre los centros ópticos de las cámaras(línea base) podemos calcular la profundidad de los puntos usando triangulos semejantes (ver figura 3.2).
 
 \[
 \frac{T - (x_{l} - x_{r})}{Z - f} =\frac{T}{Z} \Rightarrow Z = \frac{fT}{x_{l} - x_{r}} \Rightarrow Z = \frac{fT}{d}
@@ -762,10 +762,10 @@ Luego, conociendo el valor de disparidad y la distancia entre los centros óptico
 \begin{figure}[h]
 	\centering
 		\includegraphics[width=0.50\textwidth]{./figuras/fig1.png}
-	\caption{Calculo de profundidad}
+	\caption{figura 1:}
 \end{figure}
 
-De la fórmula anterior podemos observar que la distancia de un punto a las cámaras es inversamente proporcional al valor de disparidad (Ver figura 6). Si el valor de disparidad es cercano a cero, pequeñas diferencias en la disparidad producen grandes diferencias en la profundidad, y si la disparidad es grande pequeñas diferencias en la disparidad no producen diferencias en la profundidad.
+De la fórmula anterior podemos observar que la distancia de un punto a las cámaras es inversamente proporcional al valor de disparidad (ver figura 3.3). Si el valor de disparidad es cercano a cero, pequeñas diferencias en la disparidad producen grandes diferencias en la profundidad, y si la disparidad es grande pequeñas diferencias en la disparidad no producen diferencias en la profundidad.
 
 Con lo cual, si el valor de disparidad es muy pequeño o muy grande la disparidad no nos dice mucho sobre la profundidad a la que se encuentra el objeto de las cámaras. En consecuencia los sistemas de visión estéreo tienen buena resolución de profundidad cuando los objetos se encuentran relativamente cerca.
 
@@ -777,7 +777,7 @@ Con lo cual, si el valor de disparidad es muy pequeño o muy grande la disparidad
 	\caption{Relación entre disparidad y distancia}
 \end{figure}
 
-Cabe aclarar que para conseguir el mejor resultado posible eliminaremos la distorsión radial y tangencial de las imágenes obtenidas con la cámara Minoru. Además se ajusta los ángulos y distancias entre las cámaras para que los planos de las imágenes queden coplanares\footnote{Puntos o líneas que se encuentran en el mismo plano.}. A este último paso se lo conoce con el nombre de rectificación. Estas operaciones las realizamos con la librería OpenCV (Ver figura 7). 
+Cabe aclarar que para conseguir el mejor resultado posible eliminaremos la distorsion radial y tangencial de las imagenes obtenidas con la cámara Minoru. Además se ajusta los ángulos y distancias entre las cámaras para que los planos de las imagenes queden coplanares\footnote{Puntos o líneas que se encuentran en el mismo plano.}. A este último paso se lo conoce con el nombre de rectificacion. Estas operaciones las realizamos con la librería OpenCV.
 %La medida de la disparidad sirve para obtener la distancia a la que se sitúa físicamente ese objeto en la escena con respecto %a las dos cámaras
 
 %Realizando los pasos anteriores sucesivamente obtenemos el mapa de disparidad. Dicha imagen nos permite utilizar la %información obtenida de las dos imágenes para saber la profundidad de cada objeto (o punto??). Veamos el concepto que se %utiliza para poder armar esta imagen.
@@ -843,7 +843,7 @@ Las coordenadas 3D quedarían: \[ \left( \begin{array}{ccc} X/W, & Y/W, & Z/W\end
 %El flujo del algoritmo de navegación es el siguiente: 
 A continuación explicaremos brevemente los pasos realizados desde que se capturan las imágenes hasta que el robot realiza el movimiento calculado.
 
-Como primer paso, en un mismo instante, capturamos con cada cámara la escena del mundo. Luego se calcula el mapa de disparidad, habiendo eliminado la distorsión radial y tangencial de las imágenes; así como habiendo realizado la rectificación de las mismas. Una vez que obtuvimos el mapa de disparidad se realiza una heurística para encontrar el valor medio de disparidad. Con este valor construimos el punto a reproyectar, obteniendo su posición absoluta en el mundo real. Por último calculamos el ángulo de giro y la distancia a recorrer para ir a esta posición y le indicamos al robot que se movilice a dicho lugar.
+Como primer paso, en un mismo instante, capturamos con cada cámara la escena del mundo. Luego se calcula el mapa de disparidad, habiendo eliminado la distorsión radial y tangencial de las imágenes; así como habiendo realizado la rectificación de las mismas. Una vez que obtuvimos el mapa de disparidad se realiza una heuristica para encontrar el valor medio de disparidad. Con este valor construimos el punto a reproyectar, obteniendo su posición absoluta en el mundo real. Por último calculamos el ángulo de giro y la distancia a recorrer para ir a esta posición y le indicamos al robot que se movilice a dicho lugar.
 
 %En consecuencia un punto que este relativamente cerca del robot, debido que el mapa de disparidad nos brinda información útil %bajo estas condiciones.
 
@@ -854,7 +854,7 @@ A continuación explicaremos en detalle los pasos más importantes del algoritmo.
 
 Los valores de disparidad del algoritmo se asignan con el mapa de disparidad que referencia a las coordenadas de la cámara izquierda.
 
-La región de interés es el área dentro de la cual se buscan los obstáculos. Por lo tanto, el algoritmo esta diseñando para ver los obstáculos solo en esta área particular. El tamaño de la región de interés es de 640 x 40 píxeles. Esta región esta determinada entre las filas 300 y 340 de píxeles, siendo el tamaño de las imágenes de 640 x 480 píxeles.
+La región de interes es el área dentro de la cual se buscan los obstaculos. Por lo tanto, el algoritmo esta diseñando para ver los obstaculos solo en esta área particular. El tamaño de la región de interes es de 640 x 40 pixels. Esta región esta determinada entre las filas 300 y 340 de pixels, siendo el tamaño de las imágenes de 640 x 480 pixels.
 
 
 %Sobre el mapa de disparidad tomaremos una región del mismo la cual llamaremos región de interes.
@@ -876,11 +876,11 @@ La región de interés es el área dentro de la cual se buscan los obstáculos. Por 
 
 %Para evitar los obstaculos vamos a buscar, en la región de interes, el punto al cual el robot se moverá.
 
-El procedimiento de navegación consiste en buscar un punto en la región de interés, al cual dirigirse, que este relativamente cerca del robot y en el que no se encuentre ningún obstáculo. El mismo se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras. Para lograr esto buscaremos el valor de disparidad medio.
+El procedimiento de navegación consiste en buscar un punto en la región de interes, al cual dirigirse, que este relativamente cerca del robot y en el que no se encuentre ningún obstaculo. El mismo se basa en el concepto de la figura 6. El cual nos indica que los valores de disparidad cercanos a cero y los que son muy grandes no nos aportan información útil sobre la distancia que hay del punto a las cámaras. Para lograr esto buscaremos el valor de disparidad medio.
 
 \subsubsection{Heurística del valor de disparidad medio}
 %La heuristica presentada para encontrar el valor de diparidad medio, 
-La heurística consiste en recorrer la región de interés calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI\footnote{Region Of Interest} a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (Ver figura 8). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
+La heurística consiste en recorrer la región de interes calculando la mediana de los valores de disparidad de cada columna. Es decir, aplanamos el ROI\footnote{Region Of Interest} a una sola fila que contiene en cada celda el valor de disparidad medio de la columna (ver figura). Luego, calculamos la mediana de esta fila consiguiendo el valor de disparidad medio del ROI.
 
 \begin{figure}[h]
 	\centering
@@ -890,7 +890,7 @@ La heurística consiste en recorrer la región de interés calculando la mediana de
 
 Esta heurística no nos asegura que el punto encontrado sea el mejor al cual dirigirse; pero sabemos que con dicho valor de disparidad nos brinda información fehaciente de la distancia en la que se encuentra el punto de las cámaras.
 
-Puede ocurrir que el mapa de disparidad no nos provea suficiente información para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una política de escape ya que la información provista no es suficiente para determinar una decisión. La política de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
+Puede ocurrir que el mapa de disparidad no nos provea suficiente información para decidir a que punto ir, ya sea porque el objeto esta demasiado cerca o porque la imagen tiene poca luz. Esto se ve reflejado en que el ROI aplanado posee más de la mitad de los valores fuera de rango. Sí esto sucede se aplica una política de escape ya que la información provista no es suficiente para determinar una desición. La política de escape consiste en girar una cierta cantidad de grados hacia la derecha buscando una escena más apropiada para encontrar un punto al cual dirigirse.
 
 Otra ocasión en la que se aplica la política de escape es cuando el punto calculado por la heurística se encuentra muy cerca del robot. Si bien no es sumamente necesario es una mejora para encontrar mejores caminos. 
 
@@ -909,7 +909,7 @@ Otra ocasión en la que se aplica la política de escape es cuando el punto calcul
 
 Como explicamos anteriormente, para reproyectar un punto debemos multiplicar la matriz de reproyección Q por el punto a reproyectar que esta definido por: \[ \left( \begin{array}{cccc} x, & y, & d, & 1\end{array} \right) \]
 
-Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heurística (comenzando desde la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
+Con lo cual para reproyectar el punto al que se dirigirá el robot necesitamos definir $x$ e $y$. $x$ será la coordenada de la primer celda, del ROI aplanado, que contenga el valor de disparidad calculado por la heuristica (comenzando dede la izquierda), mientras que $y$ será la coordenada vertical inferior del ROI.
 
 Luego reproyectamos este punto para obtener el punto P, en el mundo real, al cual dirigirse.
 
@@ -955,10 +955,10 @@ El algoritmo de navegación ha sido probado en ambientes interiores. A continuaci
 \begin{itemize}
 	\item El piso no debe tener ninguna diferencia de nivel.
 	\item Ambientes luminosos. Si el ambiente es luminoso se consiguen mejores resultados porque la calidad de las imágenes será mejor.
-	\item Obstáculos grandes.
-	\item Obstáculos separados por una distancia considerable.
-	\item Los obstáculos están apoyados en la superficie por la que se mueve el robot. Es decir, no hay objetos colgados.
-	\item Los obstáculos no deben moverse.
+	\item Obstaculos grandes.
+	\item Obstaculos separados por una distancia considerable.
+	\item Los obstaculos están apoyados en la superficie por la que se mueve el robot. Es decir, no hay objetos colgados.
+	\item Los obstaculos no deben moverse.
 \end{itemize}
 
 %Otra limitacion importante es que los obstaculos no deben moverse, esto hace mas facil que nuestro algoritmo haga su trabajo. 
@@ -980,7 +980,7 @@ La arquitectura utilizada se puede dividir en tres partes:
 \begin{itemize}
 	\item Una computadora donde se ejecuta el algoritmo descripto. La misma es una Netbook Asus con sistema operativo Ubuntu Linux, que se encuentra apoyada en un soporte que posee el robot. 
 %La capacidad de procesamiento fue mas que suficiente para la ejecucion del mismo, entonces podemos afirmar que nuestro %algoritmo no posee altas restricciones de performance. 
-	\item El robot, que posee una micro-computadora que corre un linux 2.6 portable. El mismo está conectado a la netbook por un cable de red (RJ-45).%El cual realiza el movimiento especificado.
+	\item El robot, que posee una microcomputadora que corre un linux 2.6 portable. El mismo está conectado a la netbook por un cable de red (RJ-45).%El cual realiza el movimiento especificado.
 	\item La cámara estéreo que se encuentra en la parte superior del frente del robot. La misma esta conectada por USB a la netbook.
 \end{itemize}
 
@@ -989,7 +989,7 @@ La netbook y el robot se comunican mediante paquetes UDP. Para esto utilizamos l
 
 En el robot se encuentra un pequeño servidor esperando los paquetes UDP y nuestro programa le envía las decisiones tomadas a este servidor que las procesa y ejecuta el movimiento.
 
-Por otro lado, utilizamos la librería Libcam que nos permite capturar imágenes de alta calidad aprovechando al máximo la cámara estéreo.
+Por otro lado, utilizamos la libreria Libcam que nos permite capturar imágenes de alta calidad aprovechando al máximo la cámara estéreo.
 
 % y .  La mecanica del robot se basa en un controlador que puede controlar los motores de las ruedas. Estas son dos de cada %lado unidas por horugas. Para poder comunicarse con el robot envíamos paquetes udp desde la Netbook. Para la parte de visión %utilizamos la cámara estéreo Minoru que se encuentra conectada por usb al frente de la Netbook.
 
@@ -1013,7 +1013,7 @@ A continuación mencionaremos algunas mejoras que podrían incluirse en un trabajo
 
 \begin{itemize}
 	\item Tomar la decisión con más de una imagen. Tener un buffer de las imágenes anteriores y utilizarlas, de alguna forma,  para tomar la nueva decisión de la dirección a seguir.
-	\item Utilizar un thread aparte para capturar las imágenes. Este thread sacaría imágenes constantemente y las dejaría en una pila y cuando el algoritmo quiera decidir un nuevo camino para continuar podría desapilar las imágenes que necesite y tomar la decisión. De esta manera podría evitarse que el robot frene entre cada pasada del algoritmo.
+	\item Utilizar un thread aparte para capturar las imágenes. Este thread sacaría imágenes constantemente y las dejaría en una pila y cuando el algoritmo quiera decidir un nuevo camino para continuar podría desapilar las imágenes que necesite y tomar la desición. De esta manera podría evitarse que el robot frene entre cada pasada del algoritmo.
 \end{itemize}
 
 Además como continuación del trabajo se podría armar un mapa del lugar, visto desde arriba(2D); así como localizar el robot en dicho mapa.  %con el robot. Esto seria muy util porque nos mostraria el camino realizado por el robot.
@@ -1027,11 +1027,11 @@ Además como continuación del trabajo se podría armar un mapa del lugar, visto de
 
 \section{Conclusión}
 
-El mapa de disparidad es un método eficiente para almacenar la profundidad o distancia de cada píxel. Gracias a él podemos desarrollar distintas técnicas en visión robótica y utilizarlo en algoritmos que necesiten de información sobre su entorno. Un claro ejemplo se puede ver en este trabajo: utilizamos el mapa de disparidad para conducir un robot a través de una sala evitando colisiones.   
+El mapa de disparidad es un método efieciente para almacenar la profundidad o distancia de cada pixel. Gracias a él podemos desarrollar distintas tecnicas en vision robotica y utilizarlo en algoritmos que necesiten de informacion sobre su entorno. Un claro ejemplo se puede ver en este trabajo: utilizamos el mapa de disparidad para conducir un robot a traves de una sala evitando colisiones.   
 
-A pesar de su gran utilidad el mapa de disparidad, así como también calculo de rectificación o operaciones comunes sobre imágenes, son difícil de programar. Requieren gran desempeño por parte del programador y poseen dificultad a la hora de probarlas. Para evitar estas dificultades debimos utilizar librerías que nos permitan manejar fácilmente las imágenes y poder sacar provecho de su información representada. $OpenCV$ y $Libelas$ son las librerías que nos ayudaron a superar esta dificultad. Utilizando estas librerías se puede desarrollar importantes algoritmos de visión computacional de forma rápida. 
+A pesar de su gran utilidad el mapa de disparidad, así como también calculo de rectificación o operaciones comunes sobre imagenes, son dificil de programar. Requieren gran desempeño por parte del programador y poseen dificultad a la hora de probarlas. Para evitar estas dificultades debimos utilizar librerias que nos permitan manejar facilmente las imagenes y poder sacar provecho de su información representada. $OpenCV$ y $Libelas$ son las librerias que nos ayudaron a superar esta dificultad. Utilizando estas librerias se puede desarrollar importantes algoritmos de vision computacional de forma rápida. 
 
-Este trabajo trata de mostrar una idea sencilla de navegación a partir del mapa de disparidad. Retoma el concepto de "Región de interés" del paper citado $[1]$ y le da un análisis diferente para su utilización en la navegación. También su intención es poder extenderse en el futuro como describimos anteriormente. 
+Este trabajo trata de mostrar una idea sencilla de navegacion a partir del mapa de disparidad. Retoma el concepto de "Región de interes" del paper citado $[1]$ y le da un analisis diferente para su utilización en la navegación. También su intención es poder extenderse en el futuro como describimos anteriormente. 
 
 %El presente trabajo es una idea simple de como poder llevar a cabo un algoritmo de navegacion en una arquitectura definida. %Resulto muy interesante ver como entre sucesivos experimentos pudimos mejorar el algoritmo. Tambien nos sirve para abordar %muchos mas temas interesantes sobre vision robotica.
 
