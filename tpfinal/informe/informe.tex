@@ -1027,18 +1027,24 @@ Además como continuación del trabajo se podría armar un mapa del lugar, visto de
 
 \section{Conclusión}
 
-El mapa de disparidad es un método eficiente para almacenar la profundidad o distancia de cada píxel. Gracias a él podemos desarrollar distintas técnicas en visión robótica y utilizarlo en algoritmos que necesiten de información sobre su entorno. Un claro ejemplo se puede ver en este trabajo: utilizamos el mapa de disparidad para conducir un robot a través de una sala evitando colisiones.   
+%El mapa de disparidad es un método efieciente para almacenar la información de la profundidad o distancia de cada pixel. Los %mismos poseen la información Cada pixel,  Con esta información utilizamos...
+
+El mapa de disparidad es un método eficiente para almacenar la profundidad o distancia de cada píxel. Gracias a él podemos desarrollar distintas técnicas en visión robótica y utilizarlo en algoritmos que necesiten de información sobre su entorno. Un claro ejemplo se puede ver en este trabajo: utilizamos el mapa de disparidad para conducir un robot a través de una sala evitando colisiones.
+
+%La librería Libelas es muy eficiente para calcular mapas de disparidad, gracias al algoritmo que busca los descriptores %caracteristicos de las imágenes. De esta manera logra una eficacia muy notoria respecto a otros métodos.
+
+%La librería OpenCV nos brindo, de manera muy simple, muy buenas herramientas para el procesamiento de las imágenes.
 
 A pesar de su gran utilidad el mapa de disparidad, así como también calculo de rectificación o operaciones comunes sobre imágenes, son difícil de programar. Requieren gran desempeño por parte del programador y poseen dificultad a la hora de probarlas. Para evitar estas dificultades debimos utilizar librerías que nos permitan manejar fácilmente las imágenes y poder sacar provecho de su información representada. $OpenCV$ y $Libelas$ son las librerías que nos ayudaron a superar esta dificultad. Utilizando estas librerías se puede desarrollar importantes algoritmos de visión computacional de forma rápida. 
 
-Este trabajo trata de mostrar una idea sencilla de navegación a partir del mapa de disparidad. Retoma el concepto de "Región de interés" del paper citado $[1]$ y le da un análisis diferente para su utilización en la navegación. También su intención es poder extenderse en el futuro como describimos anteriormente. 
+Este trabajo trata de mostrar una idea sencilla de navegación a partir del mapa de disparidad. Retoma el concepto de "Región de interés" del paper citado $[1]$ y le da un análisis diferente para su utilización en la navegación. También su intención es poder extenderse en el futuro como describimos anteriormente.
 
 %El presente trabajo es una idea simple de como poder llevar a cabo un algoritmo de navegacion en una arquitectura definida. %Resulto muy interesante ver como entre sucesivos experimentos pudimos mejorar el algoritmo. Tambien nos sirve para abordar %muchos mas temas interesantes sobre vision robotica.
 
 \section{Referencias}
 
-$[1]$ Region of interest in disparity mapping for navigation of stereo vision autonomous guided vehicle.\\
-$[2]$ Learning openCV: computer vision with the openCV library.\\
-$[3]$ Multiple view geometry in computer vision.
+$[1]$ \textit{Anwar Hasni Abu Hasan, Rostam Affendi Hamzah, and Mohd Haffiz Johar, 2010. Region of interest in disparity mapping for navigation of stereo vision autonomous guided vehicle.}\\
+$[2]$ \textit{Gary Bradsky and Adrian Kaebler, 2008. Learning openCV: computer vision with the openCV library.}\\
+$[3]$ \textit{Richard Hartley and Andrew Zisserman, 2003. Multiple view geometry in computer vision, second edition.}
 
 \end{document}
